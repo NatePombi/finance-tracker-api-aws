@@ -30,6 +30,12 @@ public class GlobalException {
         return new ApiError(Instant.now(),HttpStatus.FORBIDDEN.value(),"Forbidden",ex.getMessage(),req.getRequestURI());
     }
 
+    @ExceptionHandler(BadCredentialException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handlesBadCredential(BadCredentialException ex, jakarta.servlet.http.HttpServletRequest req){
+        return new ApiError(Instant.now(),HttpStatus.FORBIDDEN.value(), "Forbidden",ex.getMessage(),req.getRequestURI());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
     public ApiError handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, jakarta.servlet.http.HttpServletRequest req){
