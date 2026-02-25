@@ -26,18 +26,18 @@ public class CategoryService {
 
         repo.save(category);
 
-        return new CategoryResponse(category.getName(), category.getType());
+        return new CategoryResponse(category.getId(),category.getName(), category.getType());
     }
 
     public List<CategoryResponse> getAll(User user){
         return repo.findByUser(user).stream()
-                .map(category-> new CategoryResponse(category.getName(), category.getType()))
+                .map(category-> new CategoryResponse(category.getId(),category.getName(), category.getType()))
                 .toList();
     }
 
     public CategoryResponse getById(User user, Long id){
         Category category =  repo.findByIdAndUser(id,user).orElseThrow(()-> new IllegalArgumentException("Category not found"));
-        return new CategoryResponse(category.getName(), category.getType());
+        return new CategoryResponse(category.getId(),category.getName(), category.getType());
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class CategoryService {
         category.changeCategoryType(type);
         category.changeName(nameTrim);
 
-        return new CategoryResponse(category.getName(), category.getType());
+        return new CategoryResponse(category.getId(),category.getName(), category.getType());
     }
 
 

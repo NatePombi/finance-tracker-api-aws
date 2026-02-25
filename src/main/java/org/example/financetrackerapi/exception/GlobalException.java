@@ -37,7 +37,7 @@ public class GlobalException {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ApiError handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, jakarta.servlet.http.HttpServletRequest req){
         String msg = ex.getBindingResult().getAllErrors().stream()
                 .map(e-> {
@@ -52,7 +52,13 @@ public class GlobalException {
             msg = "Validation failed";
         }
 
-        return new ApiError(Instant.now(), HttpStatus.UNPROCESSABLE_CONTENT.value(), "Unprocessable Content", msg, req.getRequestURI());
+        return new ApiError(Instant.now(), HttpStatus.UNPROCESSABLE_ENTITY.value(), "Unprocessable Entity", msg, req.getRequestURI());
+    }
+
+    @ExceptionHandler(EmailAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleEmailAlreadyExistException(EmailAlreadyExistException ex, jakarta.servlet.http.HttpServletRequest req){
+        return new ApiError(Instant.now(),HttpStatus.CONFLICT.value(), "Email Already Exist", ex.getMessage(), req.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)
