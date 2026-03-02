@@ -1,6 +1,8 @@
 package org.example.financetrackerapi.transaction;
 
 import lombok.RequiredArgsConstructor;
+import org.example.financetrackerapi.account.Account;
+import org.example.financetrackerapi.account.AccountRepository;
 import org.example.financetrackerapi.category.Category;
 import org.example.financetrackerapi.category.CategoryRepository;
 import org.example.financetrackerapi.user.User;
@@ -18,6 +20,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
+    private final AccountRepository accountRepository;
 
     public TransactionResponse create(TransactionRequest transactionRequest, User user) {
 
@@ -27,17 +30,17 @@ public class TransactionService {
             throw new IllegalArgumentException("Transaction type does not match Category Type");
         }
 
-        Transaction trans =Transaction.createTransaction(transactionRequest.getAmount(),transactionRequest.getType(),transactionRequest.getDate(),transactionRequest.getDescription(),user,category);
+        Account acc = accountRepository.findByIdAndUserEmail(transactionRequest.getAccountId(), user.getEmail()).orElseThrow(()-> new IllegalArgumentException("Account not found"));
+
+        Transaction trans =Transaction.createTransaction(transactionRequest.getAmount(),transactionRequest.getType(),transactionRequest.getDate(),transactionRequest.getDescription(),acc,category);
 
         transactionRepository.save(trans);
 
-        return new TransactionResponse(trans.getId(),trans.getAmount(),trans.getType(), category.getName(), trans.getDescription(),trans.getDate(),trans.getCreatedAt());
-
-
+        return toTransactionResponse(trans);
     }
 
     public Page<TransactionResponse> getTransactions(User user, Pageable pageable){
-        return transactionRepository.findAllByUserWithCategory(user, pageable)
+        return transactionRepository.findAllByAccountUserWithCategory(user, pageable)
                 .map(this::toTransactionResponse);
     }
 
@@ -46,17 +49,17 @@ public class TransactionService {
             throw new IllegalArgumentException("From date must be before TO date");
         }
 
-        return transactionRepository.findAllByUserWithCategoryAndDateBetween(user,from,to,pageable)
+        return transactionRepository.findAllByAccountUserWithCategoryAndDateBetween(user,from,to,pageable)
                 .map(this::toTransactionResponse);
     }
 
     public Page<TransactionResponse> getTransactionsByFromDate(User user, LocalDate from,Pageable pageable){
-        return transactionRepository.findAllByUserFromDate(user,from,pageable)
+        return transactionRepository.findAllByAccountUserFromDate(user,from,pageable)
                 .map(this::toTransactionResponse);
     }
 
     public Page<TransactionResponse> getTransactionByToDate(User user, LocalDate to,Pageable pageable){
-        return transactionRepository.findAllByUserToDate(user,to,pageable)
+        return transactionRepository.findAllByAccountUserToDate(user,to,pageable)
                 .map(this::toTransactionResponse);
     }
 
@@ -74,7 +77,7 @@ public class TransactionService {
     }
 
     private TransactionResponse toTransactionResponse(Transaction trans) {
-        return new TransactionResponse(trans.getId(),trans.getAmount(),trans.getType(),trans.getCategory().getName(),trans.getDescription(),trans.getDate(),trans.getCreatedAt());
+        return new TransactionResponse(trans.getId(),trans.getAmount(),trans.getType(),trans.getCategory().getName(),trans.getDescription(),trans.getAccount().getId(),trans.getAccount().getAccountType(), trans.getDate(),trans.getCreatedAt());
     }
 
 

@@ -2,6 +2,7 @@ package org.example.financetrackerapi.transaction;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.example.financetrackerapi.account.AccountType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +14,8 @@ public record TransactionResponse (
      TransactionType type,
      String categoryName,
      String description,
+     Long accountId,
+     AccountType accountType,
      LocalDate date,
      LocalDateTime createdAt)
 {}

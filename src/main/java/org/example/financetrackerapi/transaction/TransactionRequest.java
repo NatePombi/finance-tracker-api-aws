@@ -18,6 +18,8 @@ public class TransactionRequest {
     private BigDecimal amount;
     @NotNull(message = "type cannot be empty")
     private TransactionType type;
+    @NotNull(message = "account id cannot be empty")
+    private Long accountId;
     @NotNull(message = "category id cannot be empty")
     private Long categoryId;
     @NotNull(message = "date cannot be empty")

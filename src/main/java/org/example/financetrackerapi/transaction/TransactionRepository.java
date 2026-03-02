@@ -1,5 +1,6 @@
 package org.example.financetrackerapi.transaction;
 
+import org.example.financetrackerapi.account.Account;
 import org.example.financetrackerapi.category.Category;
 import org.example.financetrackerapi.user.User;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,72 +17,76 @@ import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction,Long> {
 
-    Optional<Transaction> findByIdAndUser(Long id, User user);
 
     @Query(value = """
             SELECT t 
             FROM Transaction t 
-            JOIN FETCH t.category WHERE t.user = :user AND t.date
+            JOIN FETCH t.account
+            JOIN FETCH t.category 
+            WHERE t.account.user = :user AND t.date
             BETWEEN :from AND :to 
             """,
             countQuery = """
                     SELECT COUNT(t)
                     FROM Transaction t
-                    WHERE t.user = :user
+                    WHERE t.account.user = :user
                     AND t.date
                     BETWEEN :from AND :to
                     """
     )
-    Page<Transaction> findAllByUserWithCategoryAndDateBetween(@Param("user") User user, @Param("from") LocalDate from, @Param("to") LocalDate to, Pageable pageable);
+    Page<Transaction> findAllByAccountUserWithCategoryAndDateBetween(@Param("user") User user, @Param("from") LocalDate from, @Param("to") LocalDate to, Pageable pageable);
 
-    List<Transaction> findByCategoryAndUser(Category category,User user);
 
     @Query(value = """
             SELECT t 
             FROM Transaction t 
-            JOIN  FETCH t.category WHERE t.user = :user
+            JOIN FETCH t.account
+            JOIN  FETCH t.category 
+            WHERE t.account.user = :user
                         """,
             countQuery = """
                 SELECT COUNT(t)
                 FROM Transaction t
-                WHERE t.user = :user
+                WHERE t.account.user = :user
                 """
     )
-    Page<Transaction> findAllByUserWithCategory(@Param("user") User user,Pageable pageable);
+    Page<Transaction> findAllByAccountUserWithCategory(@Param("user") User user,Pageable pageable);
 
     @Query(value = """
             SELECT t
              FROM  Transaction t
+             JOIN FETCH t.account
              JOIN FETCH t.category 
-             WHERE t.user = :user
+             WHERE t.account.user = :user
               AND t.date <= :date
 """,
     countQuery = """
         SELECT COUNT(t)
         FROM Transaction t
-        WHERE t.user = :user
+        WHERE t.account.user = :user
         And t.date <= :date
 """)
-    Page<Transaction> findAllByUserToDate(@Param("user") User user,@Param("date") LocalDate date,Pageable pageable);
+    Page<Transaction> findAllByAccountUserToDate(@Param("user") User user,@Param("date") LocalDate date,Pageable pageable);
 
     @Query(value = """
         SELECT  t 
-        FROM Transaction t 
+        FROM Transaction t
+        JOIN FETCH t.account
         JOIN FETCH t.category 
-        WHERE t.user = :user AND t.date >= :date
+        WHERE t.account.user = :user AND t.date >= :date
 """,
     countQuery = """
         SELECT COUNT(t)
         FROM Transaction t 
-        WHERE t.user = :user
+        WHERE t.account.user = :user
         AND t.date >= :date
 """)
-    Page<Transaction> findAllByUserFromDate(@Param("user") User user, @Param("date") LocalDate date, Pageable pageable);
+    Page<Transaction> findAllByAccountUserFromDate(@Param("user") User user, @Param("date") LocalDate date, Pageable pageable);
 
     @Query(value = """
             SELECT COALESCE(SUM(t.amount),0) 
             FROM Transaction t 
-            WHERE t.user = :user
+            WHERE t.account.user = :user
             AND t.type = 'CREDIT'
             AND YEAR(t.date) = :year
             AND MONTH(t.date) = :month
@@ -91,7 +96,7 @@ public interface TransactionRepository extends JpaRepository<Transaction,Long> {
     @Query(value = """
           SELECT COALESCE(SUM(t.amount),0)
           FROM Transaction t
-          WHERE t.user = :user
+          WHERE t.account.user = :user
           AND t.type = 'DEBIT'
           AND YEAR(t.date) = :year
           AND MONTH(t.date) = :month
@@ -103,7 +108,7 @@ public interface TransactionRepository extends JpaRepository<Transaction,Long> {
             SELECT new org.example.financetrackerapi.transaction.CategorySummaryResponse(t.category.name,SUM(t.amount)
             )
             FROM Transaction t
-            WHERE t.user = :user
+            WHERE t.account.user = :user
             AND t.type = 'DEBIT'
             AND YEAR(t.date) = :year
             AND MONTH(t.date) = :month
@@ -112,4 +117,28 @@ public interface TransactionRepository extends JpaRepository<Transaction,Long> {
 """
     )
     List<CategorySummaryResponse> sumDebitByCategoryForMonth(@Param("user") User user,@Param("year") int year,@Param("month") int month);
+
+
+    @Query(
+            """
+            SELECT COALESCE(SUM(
+            CASE 
+               WHEN t.type = org.example.financetrackerapi.transaction.TransactionType.CREDIT
+               THEN t.amount
+               ELSE 0
+               END
+            ),0) 
+            -
+            COALESCE(SUM( 
+            CASE 
+                WHEN t.type = org.example.financetrackerapi.transaction.TransactionType.DEBIT
+                THEN t.amount
+                ELSE 0 
+                END 
+                ),0)
+            FROM Transaction t
+            WHERE t.account = :account
+"""
+    )
+    BigDecimal balance(@Param("account") Account account);
 }

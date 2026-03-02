@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.financetrackerapi.account.Account;
 import org.example.financetrackerapi.category.Category;
 import org.example.financetrackerapi.user.User;
 import org.hibernate.annotations.CreationTimestamp;
@@ -28,8 +29,8 @@ public class Transaction {
     @Column(length = 255)
     private String description;
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "user_id",nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id",nullable = false)
+    private Account account;
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "category_id",nullable = false)
     private Category category;
@@ -39,11 +40,11 @@ public class Transaction {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public static Transaction createTransaction(BigDecimal transactionAmount, TransactionType type,LocalDate date,String description,User user, Category category) {
+    public static Transaction createTransaction(BigDecimal transactionAmount, TransactionType type,LocalDate date,String description,Account account, Category category) {
         Transaction transaction = new Transaction();
         transaction.amount = transactionAmount;
         transaction.type = type;
-        transaction.user = user;
+        transaction.account = account;
         transaction.category = category;
         transaction.date = date;
         transaction.description = description;

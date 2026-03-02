@@ -18,6 +18,12 @@ public class GlobalException {
     record ApiError(Instant timestamp, int status, String error, String message,String path ){}
 
 
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleUserNotFoundException(UserNotFoundException ex, jakarta.servlet.http.HttpServletRequest request) {
+        return new ApiError(Instant.now(), HttpStatus.NOT_FOUND.value(), "User not Found", ex.getMessage(), request.getRequestURI());
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleIllegalArgumentException(IllegalArgumentException ex, jakarta.servlet.http.HttpServletRequest request) {
