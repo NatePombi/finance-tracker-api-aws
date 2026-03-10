@@ -40,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
 public class AccountIntegrationTest {
     @Autowired
@@ -153,6 +154,7 @@ public class AccountIntegrationTest {
 
         Transaction transaction =Transaction.createTransaction(BigDecimal.valueOf(4000), TransactionType.CREDIT, LocalDate.now(),"Bought Laptop",account,category);
         transactionRepository.save(transaction);
+
 
 
         mockMvc.perform(get("/accounts/1")
