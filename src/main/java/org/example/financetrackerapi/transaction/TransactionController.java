@@ -1,6 +1,9 @@
 package org.example.financetrackerapi.transaction;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.example.financetrackerapi.user.User;
 import org.springframework.data.domain.Page;
@@ -22,13 +25,14 @@ public class TransactionController {
 
 
     @PostMapping
-    public ResponseEntity<TransactionResponse> create(@RequestBody @Valid TransactionRequest transactionRequest, @AuthenticationPrincipal User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.create(transactionRequest, user));
+    public ResponseEntity<TransactionResponse> create(@RequestBody @Valid TransactionRequest transactionRequest, @AuthenticationPrincipal(expression = "username") String email) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.create(transactionRequest, email));
     }
 
 
     @GetMapping
-    public ResponseEntity<Page<TransactionResponse>> getTransactions(@AuthenticationPrincipal User user,
+    public ResponseEntity<Page<TransactionResponse>> getTransactions(@Parameter(hidden = true)
+                                                                     @AuthenticationPrincipal(expression = "username") String email,
                                                                      @RequestParam(required = false)LocalDate from,
                                                                      @RequestParam(required = false) LocalDate to,
                                                                      Pageable pageable) {
@@ -37,32 +41,32 @@ public class TransactionController {
                 throw new IllegalArgumentException("From date must be before TO date");
             }
 
-            return ResponseEntity.ok(transactionService.getTransactionsByDate(user, from, to,pageable));
+            return ResponseEntity.ok(transactionService.getTransactionsByDate(email, from, to,pageable));
         }
 
         if(from != null) {
-            return ResponseEntity.ok(transactionService.getTransactionsByFromDate(user,from,pageable));
+            return ResponseEntity.ok(transactionService.getTransactionsByFromDate(email,from,pageable));
         }
 
         if(to != null) {
-            return ResponseEntity.ok(transactionService.getTransactionByToDate(user,to,pageable));
+            return ResponseEntity.ok(transactionService.getTransactionByToDate(email,to,pageable));
         }
 
-        return ResponseEntity.ok(transactionService.getTransactions(user,pageable));
+        return ResponseEntity.ok(transactionService.getTransactions(email,pageable));
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<MonthlySummaryReport> getMonthlySummary(@AuthenticationPrincipal User user,
+    public ResponseEntity<MonthlySummaryReport> getMonthlySummary(@AuthenticationPrincipal(expression = "username") String email,
                                                                   @RequestParam int year,
                                                                   @RequestParam int month) {
-        return ResponseEntity.ok(transactionService.getMonthlySummaryReport(user, year, month));
+        return ResponseEntity.ok(transactionService.getMonthlySummaryReport(email, year, month));
     }
 
     @GetMapping("/summary/category")
-    public ResponseEntity<List<CategorySummaryResponse>> getCategorySummary(@AuthenticationPrincipal User user,
+    public ResponseEntity<List<CategorySummaryResponse>> getCategorySummary(@AuthenticationPrincipal(expression = "username") String email,
                                                                       @RequestParam int year,
-                                                                      @RequestParam int month) {
-        return ResponseEntity.ok(transactionService.getCategorySummaryResponse(user,year,month));
+                                                                      @Min(1) @Max(12) @RequestParam int month) {
+        return ResponseEntity.ok(transactionService.getCategorySummaryResponse(email,year,month));
     }
 
 }
