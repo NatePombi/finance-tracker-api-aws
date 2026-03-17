@@ -67,7 +67,7 @@ public class TransactionControllerTest {
         TransactionResponse response = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries",request.getDescription(),1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
         when(service.create(request,"test@gmail.com")).thenReturn(response);
 
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post("/api/v1/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -77,7 +77,7 @@ public class TransactionControllerTest {
 
     @Test
     void shouldFailCreateTransaction_NotLoggedIn() throws Exception {
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post("/api/v1/transactions")
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
@@ -88,7 +88,7 @@ public class TransactionControllerTest {
         TransactionRequest request = new TransactionRequest(new BigDecimal(1200), null,1L,1L, LocalDate.now(),"Bought groceries");
 
 
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post("/api/v1/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
                         .with(csrf()))
@@ -101,7 +101,7 @@ public class TransactionControllerTest {
     void shouldFailCreateTransaction_NegativeAmount() throws Exception {
         TransactionRequest request = new TransactionRequest(new BigDecimal(-1200), TransactionType.DEBIT,1L,1L, LocalDate.now(),"Bought groceries");
 
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post("/api/v1/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
                         .with(csrf()))
@@ -120,7 +120,7 @@ public class TransactionControllerTest {
 
         when(service.getTransactions(eq("test@gmail.com"), any(Pageable.class))).thenReturn(page);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(22))
@@ -151,7 +151,7 @@ public class TransactionControllerTest {
 
         when(service.getTransactionsByDate(eq("test@gmail.com"),eq(LocalDate.of(2026,1,9)),eq(LocalDate.of(2026,2,20)), any(Pageable.class))).thenReturn(page);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("from", "2026-01-09")
                         .param("to", "2026-02-20")
                         .with(csrf()))
@@ -176,7 +176,7 @@ public class TransactionControllerTest {
 
         when(service.getTransactionsByFromDate(eq("test@gmail.com"),eq(LocalDate.of(2026,3,1)), any(Pageable.class))).thenReturn(page);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("from", "2026-03-01")
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -202,7 +202,7 @@ public class TransactionControllerTest {
 
         when(service.getTransactionByToDate(eq("test@gmail.com"),eq(LocalDate.of(2026,2,20)), any(Pageable.class))).thenReturn(page);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("to", "2026-02-20")
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -214,7 +214,7 @@ public class TransactionControllerTest {
 
     @Test
     void shouldFailGetTransactions_NotLoggedIn0() throws Exception {
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .with(csrf()))
                         .andExpect(status().isUnauthorized());
     }
@@ -223,7 +223,7 @@ public class TransactionControllerTest {
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldFailGetTransactions_BadRequest() throws Exception {
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("from", "2026-01-09")
                         .param("to", "invalid")
                         .with(csrf()))
@@ -237,7 +237,7 @@ public class TransactionControllerTest {
 
         when(service.getMonthlySummaryReport(eq("test@gmail.com"),eq(2026),eq(3))).thenReturn(report);
 
-        mockMvc.perform(get("/transactions/summary")
+        mockMvc.perform(get("/api/v1/transactions/summary")
                 .param("year", "2026")
                 .param("month", "3")
                 .with(csrf()))
@@ -252,7 +252,7 @@ public class TransactionControllerTest {
     @Test
     void shouldFailGetMonthlyTransactions_NotLoggedIn() throws Exception {
 
-        mockMvc.perform(get("/transactions/summary")
+        mockMvc.perform(get("/api/v1/transactions/summary")
                 .param("year", "2026")
                 .param("month", "3")
                 .with(csrf()))
@@ -263,7 +263,7 @@ public class TransactionControllerTest {
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
     void shouldFailGetMonthlyTransactions_BadRequest() throws Exception {
 
-        mockMvc.perform(get("/transactions/summary")
+        mockMvc.perform(get("/api/v1/transactions/summary")
                 .param("year", "2026")
                 .param("month", "invalid")
                 .with(csrf()))
@@ -283,7 +283,7 @@ public class TransactionControllerTest {
 
         when(service.getCategorySummaryResponse(eq("test@gmail.com"),eq(2026),eq(3))).thenReturn(responseList);
 
-        mockMvc.perform(get("/transactions/summary/category")
+        mockMvc.perform(get("/api/v1/transactions/summary/category")
                 .param("year", "2026")
                 .param("month", "3")
                 .with(csrf()))
@@ -298,7 +298,7 @@ public class TransactionControllerTest {
 
     @Test
     void shouldFailGetCategorySummary_NotLoggedIn() throws Exception {
-        mockMvc.perform(get("/transactions/summary/category")
+        mockMvc.perform(get("/api/v1/transactions/summary/category")
                 .param("year", "2026")
                 .param("month", "3")
                 .with(csrf()))
@@ -308,7 +308,7 @@ public class TransactionControllerTest {
     @Test
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
     void shouldFailGetCategorySummary_BadRequest() throws Exception {
-        mockMvc.perform(get("/transactions/summary/category")
+        mockMvc.perform(get("/api/v1/transactions/summary/category")
                 .param("year", "2026")
                 .param("month", "invalid")
                 .with(csrf()))

@@ -20,6 +20,7 @@ spring:
 
   flyway:
     community-db-support-enabled: false
+    enabled: false
 
 logging:
   level:

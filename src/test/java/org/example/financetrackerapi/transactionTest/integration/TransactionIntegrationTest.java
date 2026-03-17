@@ -87,7 +87,7 @@ public class TransactionIntegrationTest {
 
         TransactionResponse response = transactionService.create(request,testUser.getEmail());
 
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post("/api/v1/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
@@ -104,7 +104,7 @@ public class TransactionIntegrationTest {
 
     @Test
     void shouldFailCreateTransaction_NotLoggedIn() throws Exception {
-        mockMvc.perform(post("/transactions"))
+        mockMvc.perform(post("/api/v1/transactions"))
                 .andExpect(status().isUnauthorized());
 
     }
@@ -114,7 +114,7 @@ public class TransactionIntegrationTest {
     void shouldFailCreateTransaction_BadCredentials() throws Exception {
         TransactionRequest request = new TransactionRequest(new BigDecimal(2000), null,1L,1L, LocalDate.now(),"Deposit to Savings");
 
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post("/api/v1/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
@@ -128,7 +128,7 @@ public class TransactionIntegrationTest {
     void shouldFailCreateTransaction_NegativeAmount() throws Exception {
         TransactionRequest request = new TransactionRequest(new BigDecimal(-2000), null,1L,1L, LocalDate.now(),"Deposit to Savings");
 
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post("/api/v1/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
@@ -148,7 +148,7 @@ public class TransactionIntegrationTest {
 
         Page<TransactionResponse> responsePage = transactionService.getTransactions(testUser.getEmail(),pageable);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                 .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -187,7 +187,7 @@ public class TransactionIntegrationTest {
 
         Page<TransactionResponse> responsePage = transactionService.getTransactionsByDate(testUser.getEmail(),LocalDate.of(2025,11,1),LocalDate.of(2026,2,20),pageable);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("from","2025-11-01")
                         .param("to","2026-02-20")
                         .with(csrf()))
@@ -228,7 +228,7 @@ public class TransactionIntegrationTest {
 
         Page<TransactionResponse> responsePage = transactionService.getTransactionsByFromDate(testUser.getEmail(),LocalDate.of(2026,3,1),pageable);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("from","2025-03-01")
                         .with(csrf()))
                 .andExpect(status().isOk());
@@ -263,7 +263,7 @@ public class TransactionIntegrationTest {
 
         Page<TransactionResponse> responsePage = transactionService.getTransactionByToDate(testUser.getEmail(),LocalDate.of(2025,12,30),pageable);
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("to","2025-12-30")
                         .with(csrf()))
                 .andExpect(status().isOk());
@@ -286,7 +286,7 @@ public class TransactionIntegrationTest {
     @Test
     void shouldFailGetTransactions_NotLoggedIn() throws Exception {
 
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("from","2025-03-01"))
                 .andExpect(status().isUnauthorized());
     }
@@ -295,7 +295,7 @@ public class TransactionIntegrationTest {
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldFailGetTransaction_BadRequest() throws Exception {
-        mockMvc.perform(get("/transactions")
+        mockMvc.perform(get("/api/v1/transactions")
                         .param("from","invalid")
                         .with(csrf()))
                 .andExpect(status().isBadRequest());
@@ -315,7 +315,7 @@ public class TransactionIntegrationTest {
 
         MonthlySummaryReport report = transactionService.getMonthlySummaryReport("test@gmail.com",2026,3);
 
-        mockMvc.perform(get("/transactions/summary")
+        mockMvc.perform(get("/api/v1/transactions/summary")
                 .param("year","2026")
                 .param("month","3")
                 .with(csrf()))
@@ -333,7 +333,7 @@ public class TransactionIntegrationTest {
 
    @Test
     void shouldFailGetMonthlyTransactions_NotLoggedIn() throws Exception {
-       mockMvc.perform(get("/transactions/summary")
+       mockMvc.perform(get("/api/v1/transactions/summary")
                        .param("year","2026")
                        .param("month","3"))
                .andExpect(status().isUnauthorized());
@@ -344,7 +344,7 @@ public class TransactionIntegrationTest {
    @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldFailGetMonthlyTransactions_BadRequest() throws Exception {
-       mockMvc.perform(get("/transactions/summary")
+       mockMvc.perform(get("/api/v1/transactions/summary")
                        .param("year","2026")
                        .param("month","invalid")
                        .with(csrf()))
@@ -365,7 +365,7 @@ public class TransactionIntegrationTest {
 
         List<CategorySummaryResponse> responseList = transactionService.getCategorySummaryResponse("test@gmail.com",2026,3);
 
-        mockMvc.perform(get("/transactions/summary/category")
+        mockMvc.perform(get("/api/v1/transactions/summary/category")
                 .param("year","2026")
                 .param("month","3")
                 .with(csrf()))
@@ -381,7 +381,7 @@ public class TransactionIntegrationTest {
    @Test
     void shouldFailGetCategorySummary_NotLoggedIn() throws Exception {
 
-        mockMvc.perform(get("/transactions/summary/category")
+        mockMvc.perform(get("/api/v1/transactions/summary/category")
                 .param("year","2026")
                 .param("month","3")
                 .with(csrf()))
@@ -391,7 +391,7 @@ public class TransactionIntegrationTest {
    @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldFailGetCategorySummary_BadRequest() throws Exception {
-        mockMvc.perform(get("/transactions/summary/category")
+        mockMvc.perform(get("/api/v1/transactions/summary/category")
                 .param("year","2026")
                 .param("month","invalid")
                 .with(csrf()))

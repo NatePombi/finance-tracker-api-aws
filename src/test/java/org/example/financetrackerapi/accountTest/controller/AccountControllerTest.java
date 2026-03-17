@@ -59,7 +59,7 @@ public class AccountControllerTest {
 
         when(service.create(any(AccountRequest.class),any())).thenReturn(response);
 
-        mockMvc.perform(post("/accounts")
+        mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -78,7 +78,7 @@ public class AccountControllerTest {
 
         when(service.create(any(AccountRequest.class),any())).thenReturn(response);
 
-        mockMvc.perform(post("/accounts")
+        mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -93,7 +93,7 @@ public class AccountControllerTest {
 
         when(service.create(any(AccountRequest.class),any())).thenReturn(response);
 
-        mockMvc.perform(post("/accounts")
+        mockMvc.perform(post("/api/v1/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
                         .with(csrf()))
@@ -111,7 +111,7 @@ public class AccountControllerTest {
 
         when(service.getAccounts(testUser.getEmail())).thenReturn(responses);
 
-        mockMvc.perform(get("/accounts")
+        mockMvc.perform(get("/api/v1/accounts")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Savings Account"))
@@ -131,7 +131,7 @@ public class AccountControllerTest {
 
         when(service.getAccounts(testUser.getEmail())).thenReturn(responses);
 
-        mockMvc.perform(get("/accounts")
+        mockMvc.perform(get("/api/v1/accounts")
                 .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
@@ -143,7 +143,7 @@ public class AccountControllerTest {
         BalanceResponse response = new BalanceResponse(BigDecimal.valueOf(550));
         when(service.getBalance(any(),any())).thenReturn(response);
 
-        mockMvc.perform(get("/accounts/1")
+        mockMvc.perform(get("/api/v1/accounts/1")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(550));
@@ -154,7 +154,7 @@ public class AccountControllerTest {
         BalanceResponse response = new BalanceResponse(BigDecimal.valueOf(550));
         when(service.getBalance(any(),any())).thenReturn(response);
 
-        mockMvc.perform(get("/accounts/1")
+        mockMvc.perform(get("/api/v1/accounts/1")
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
