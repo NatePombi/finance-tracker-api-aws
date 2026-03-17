@@ -62,7 +62,7 @@ public class CategoryControllerTest {
 
         when(service.create(testUser.getEmail(),"Salary",CategoryType.CREDIT)).thenReturn(response);
 
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
@@ -75,7 +75,7 @@ public class CategoryControllerTest {
         CategoryRequest request = new CategoryRequest("Salary", CategoryType.CREDIT);
 
 
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
@@ -92,7 +92,7 @@ public class CategoryControllerTest {
 
         when(service.create(testUser.getEmail(),"Salary",CategoryType.CREDIT)).thenReturn(response);
 
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
@@ -111,7 +111,7 @@ public class CategoryControllerTest {
 
 
 
-        mockMvc.perform(get("/categories")
+        mockMvc.perform(get("/api/v1/categories")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].name").value("Savings"))
@@ -131,7 +131,7 @@ public class CategoryControllerTest {
             when(service.getAll(testUser.getEmail())).thenReturn(List.of(response,response1));
 
 
-            mockMvc.perform(get("/categories")
+            mockMvc.perform(get("/api/v1/categories")
                             .with(csrf()))
                     .andExpect(status().isUnauthorized());
 
@@ -145,7 +145,7 @@ public class CategoryControllerTest {
 
         when(service.getById(testUser.getEmail(),1L)).thenReturn(response);
 
-        mockMvc.perform(get("/categories/1")
+        mockMvc.perform(get("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Savings"));
@@ -159,7 +159,7 @@ public class CategoryControllerTest {
 
        when(service.getById(testUser.getEmail(),1L)).thenReturn(response);
 
-       mockMvc.perform(get("/categories/1")
+       mockMvc.perform(get("/api/v1/categories/1")
                        .with(csrf()))
                .andExpect(status().isUnauthorized());
    }
@@ -171,7 +171,7 @@ public class CategoryControllerTest {
 
         when(service.getById("test@gmail.com",1L)).thenThrow(new CategoryNotFoundException("Not Found"));
 
-        mockMvc.perform(get("/categories/1")
+        mockMvc.perform(get("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isNotFound());
     }
@@ -187,7 +187,7 @@ public class CategoryControllerTest {
 
         when(service.update(testUser.getEmail(),1L,"loan",CategoryType.CREDIT)).thenReturn(response);
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
@@ -202,7 +202,7 @@ public class CategoryControllerTest {
         CategoryRequest request = new CategoryRequest("Savings",CategoryType.CREDIT);
 
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
@@ -215,7 +215,7 @@ public class CategoryControllerTest {
     void shouldFailUpdateCategory_CategoryNameEmpty() throws Exception {
         CategoryRequest request = new CategoryRequest(null,CategoryType.CREDIT);
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
@@ -231,7 +231,7 @@ public class CategoryControllerTest {
 
         when(service.update(testUser.getEmail(),1L,"Savings",CategoryType.CREDIT)).thenThrow(new CategoryNameAlreadyExistsException("Duplicate"));
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
@@ -245,7 +245,7 @@ public class CategoryControllerTest {
     void shouldDeleteCategory() throws Exception {
         doNothing().when(service).delete("test@gmail.com",1L);
 
-        mockMvc.perform(delete("/categories/1")
+        mockMvc.perform(delete("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isNoContent());
     }
@@ -253,7 +253,7 @@ public class CategoryControllerTest {
 
     @Test
     void shouldFailDeleteCategory_NotLoggedIn() throws Exception {
-        mockMvc.perform(delete("/categories/1")
+        mockMvc.perform(delete("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
@@ -263,7 +263,7 @@ public class CategoryControllerTest {
     void shouldFailDeleteCategory_CategoryNotFound() throws Exception {
         doThrow(new CategoryNotFoundException("Not Found")).when(service).delete(eq("test@gmail.com"),eq(1L));
 
-        mockMvc.perform(delete("/categories/1")
+        mockMvc.perform(delete("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isNotFound());
     }

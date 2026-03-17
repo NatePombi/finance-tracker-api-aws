@@ -65,7 +65,7 @@ public class AccountIntegrationTest {
         userRepository.save(user);
         AccountRequest request = new AccountRequest("Saving Account", AccountType.SAVINGS);
 
-        mockMvc.perform(post("/accounts")
+        mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -81,7 +81,7 @@ public class AccountIntegrationTest {
     void shouldFailCreateAccount_NotLoggedIn() throws Exception {
         AccountRequest request = new AccountRequest("Saving Account", AccountType.SAVINGS);
 
-        mockMvc.perform(post("/accounts")
+        mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
@@ -93,7 +93,7 @@ public class AccountIntegrationTest {
     void shouldFailCreateAccount_BadCredentials() throws Exception {
         AccountRequest request = new AccountRequest(null, AccountType.SAVINGS);
 
-        mockMvc.perform(post("/accounts")
+        mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -112,7 +112,7 @@ public class AccountIntegrationTest {
         accountRepository.save(account);
         accountRepository.save(account1);
 
-        mockMvc.perform(get("/accounts")
+        mockMvc.perform(get("/api/v1/accounts")
                 .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -133,7 +133,7 @@ public class AccountIntegrationTest {
         accountRepository.save(account);
         accountRepository.save(account1);
 
-        mockMvc.perform(get("/accounts"))
+        mockMvc.perform(get("/api/v1/accounts"))
                 .andExpect(status().isUnauthorized());
 
     }
@@ -157,7 +157,7 @@ public class AccountIntegrationTest {
 
 
 
-        mockMvc.perform(get("/accounts/1")
+        mockMvc.perform(get("/api/v1/accounts/1")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(4000));

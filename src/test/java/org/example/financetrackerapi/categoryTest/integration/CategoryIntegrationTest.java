@@ -61,7 +61,7 @@ public class CategoryIntegrationTest {
         CategoryRequest request = new CategoryRequest("Savings", CategoryType.CREDIT);
 
 
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -75,7 +75,7 @@ public class CategoryIntegrationTest {
     void shouldFailCreateCategory_NoLoggedIn() throws Exception {
         CategoryRequest request = new CategoryRequest("Savings", CategoryType.CREDIT);
 
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
@@ -89,7 +89,7 @@ public class CategoryIntegrationTest {
 
         CategoryRequest request = new CategoryRequest(null,CategoryType.CREDIT);
 
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post("/api/v1/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -105,7 +105,7 @@ public class CategoryIntegrationTest {
         categoryRepository.save(cat1);
         categoryRepository.save(cat2);
 
-        mockMvc.perform(get("/categories")
+        mockMvc.perform(get("/api/v1/categories")
                 .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -122,7 +122,7 @@ public class CategoryIntegrationTest {
     @Test
     void shouldFailGetAllUserCategories_NotLoggedIn() throws Exception {
 
-        mockMvc.perform(get("/categories"))
+        mockMvc.perform(get("/api/v1/categories"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -134,7 +134,7 @@ public class CategoryIntegrationTest {
         categoryRepository.save(cat1);
         categoryRepository.save(cat2);
 
-        mockMvc.perform(get("/categories/1")
+        mockMvc.perform(get("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -147,7 +147,7 @@ public class CategoryIntegrationTest {
     @Test
     void shouldFailGetUserCategoryById_NotLoggedIn() throws Exception {
 
-        mockMvc.perform(get("/categories/1"))
+        mockMvc.perform(get("/api/v1/categories/1"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -155,7 +155,7 @@ public class CategoryIntegrationTest {
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldFailGetUSerCategoryById_CategoryNotFound() throws Exception {
 
-        mockMvc.perform(get("/categories/1")
+        mockMvc.perform(get("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isNotFound());
     }
@@ -171,7 +171,7 @@ public class CategoryIntegrationTest {
 
         CategoryRequest request = new CategoryRequest("Loan",CategoryType.DEBIT);
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -186,7 +186,7 @@ public class CategoryIntegrationTest {
     @Test
     void shouldFailUpdateCategory_NotLoggedIn() throws Exception {
         CategoryRequest request = new CategoryRequest("Loan",CategoryType.CREDIT);
-        mockMvc.perform(patch("/categories/1"))
+        mockMvc.perform(patch("/api/v1/categories/1"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -195,7 +195,7 @@ public class CategoryIntegrationTest {
     void shouldFailUpdateCategory_CategoryNameBlank() throws Exception {
         CategoryRequest request = new CategoryRequest(null,CategoryType.CREDIT);
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -208,7 +208,7 @@ public class CategoryIntegrationTest {
     void shouldFailUpdateCategory_CategoryNotFound() throws Exception {
         CategoryRequest request = new CategoryRequest("loan", CategoryType.DEBIT);
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -226,7 +226,7 @@ public class CategoryIntegrationTest {
 
         CategoryRequest request = new CategoryRequest("Groceries",CategoryType.DEBIT);
 
-        mockMvc.perform(patch("/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
@@ -243,7 +243,7 @@ public class CategoryIntegrationTest {
         categoryRepository.save(cat1);
         categoryRepository.save(cat2);
 
-        mockMvc.perform(delete("/categories/1")
+        mockMvc.perform(delete("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -260,7 +260,7 @@ public class CategoryIntegrationTest {
     @Test
     void shouldFailDeleteCategory_NotLoggedIn() throws Exception {
 
-        mockMvc.perform(delete("/categories/1"))
+        mockMvc.perform(delete("/api/v1/categories/1"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -268,7 +268,7 @@ public class CategoryIntegrationTest {
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldFailDeleteCategory_CategoryNotFound() throws Exception {
 
-        mockMvc.perform(delete("/categories/1")
+        mockMvc.perform(delete("/api/v1/categories/1")
                 .with(csrf()))
                 .andExpect(status().isNotFound());
 
@@ -277,7 +277,7 @@ public class CategoryIntegrationTest {
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldFailUpdateCategory_BadRequest() throws Exception {
-        mockMvc.perform(delete("/categories/badRequest")
+        mockMvc.perform(delete("/api/v1/categories/badRequest")
                 .with(csrf()))
                 .andExpect(status().isBadRequest());
     }
