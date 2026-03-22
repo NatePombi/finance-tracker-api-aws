@@ -1,6 +1,10 @@
 package org.example.financetrackerapi.transaction;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -16,20 +20,38 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@Tag(name = "Transactions", description = "Operations related to Financial transactions")
 @RestController
 @RequestMapping("/api/v1/transactions")
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
 
-
+    @Operation(summary = "Create a new Transactions",
+                description = "Creates a financial transactions for authenticated User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Transaction created Successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "409", description = "Conflict"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
+    })
     @PostMapping
     public ResponseEntity<TransactionResponse> create(@RequestBody @Valid TransactionRequest transactionRequest, @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.create(transactionRequest, email));
     }
 
-
+    @Operation(summary = "Get Transactions",
+            description = "Gets All transactions from authenticated User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Gets Transactions successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "409", description = "Conflict"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
+    })
     @GetMapping
     public ResponseEntity<Page<TransactionResponse>> getTransactions(@Parameter(hidden = true)
                                                                      @AuthenticationPrincipal(expression = "username") String email,
@@ -55,6 +77,16 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getTransactions(email,pageable));
     }
 
+    @Operation(summary = "Gets monthly Summary Report",
+            description = "Gets monthly summary Report from authenticated User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Get Monthly Summary Report Successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "409", description = "Conflict"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
+    })
     @GetMapping("/summary")
     public ResponseEntity<MonthlySummaryReport> getMonthlySummary(@AuthenticationPrincipal(expression = "username") String email,
                                                                   @RequestParam int year,
@@ -62,6 +94,16 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getMonthlySummaryReport(email, year, month));
     }
 
+    @Operation(summary = "Get Category Summary Response",
+            description = "Get Category for authenticated User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Get Category Summary Response Successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "409", description = "Conflict"),
+            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
+    })
     @GetMapping("/summary/category")
     public ResponseEntity<List<CategorySummaryResponse>> getCategorySummary(@AuthenticationPrincipal(expression = "username") String email,
                                                                       @RequestParam int year,
