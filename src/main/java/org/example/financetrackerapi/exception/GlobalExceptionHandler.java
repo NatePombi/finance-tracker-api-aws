@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
@@ -53,6 +54,7 @@ public class GlobalExceptionHandler {
     public ApiError handlesAccessDenied(AccessDeniedException ex, jakarta.servlet.http.HttpServletRequest req){
         return new ApiError(Instant.now(),HttpStatus.FORBIDDEN.value(),"Forbidden",ex.getMessage(),req.getRequestURI());
     }
+    
 
     @ExceptionHandler(BadCredentialException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)

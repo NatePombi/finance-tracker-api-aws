@@ -1,6 +1,7 @@
 package org.example.financetrackerapi.category;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +32,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest categoryRequest, @AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest categoryRequest, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(email,categoryRequest.getCategoryName(),categoryRequest.getCategoryType()));
     }
 
@@ -46,7 +47,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories(@AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(@Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.ok(categoryService.getAll(email));
     }
 
@@ -61,7 +62,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getById(@PathVariable Long id, @AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<CategoryResponse> getById(@Parameter(description = "Category ID") @PathVariable Long id, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.ok(categoryService.getById(email,id));
     }
 
@@ -76,7 +77,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @Valid @RequestBody CategoryRequest categoryRequest, @AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<CategoryResponse> update(@Parameter(description = "Category ID") @PathVariable Long id, @Valid @RequestBody CategoryRequest categoryRequest, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.ok(categoryService.update(email,id,categoryRequest.getCategoryName(),categoryRequest.getCategoryType()));
     }
 
@@ -92,7 +93,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<Void> delete(@Parameter(description = "Category ID") @PathVariable Long id, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
        categoryService.delete(email,id);
         return ResponseEntity.noContent().build();
     }

@@ -1,6 +1,7 @@
 package org.example.financetrackerapi.account;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +34,7 @@ public class AccountController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @PostMapping
-    public ResponseEntity<AccountResponse> create(@Valid @RequestBody AccountRequest accountRequest, @AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<AccountResponse> create(@Valid @RequestBody AccountRequest accountRequest, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.create(accountRequest, email));
     }
 
@@ -48,7 +49,7 @@ public class AccountController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @GetMapping
-    public ResponseEntity<List<AccountResponse>> getAll(@AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<List<AccountResponse>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.ok(accountService.getAccounts(email));
     }
 
@@ -63,7 +64,7 @@ public class AccountController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<BalanceResponse> getBalance(@PathVariable Long id,@AuthenticationPrincipal(expression = "username") String email){
+    public ResponseEntity<BalanceResponse> getBalance(@Parameter(description = "Account ID") @PathVariable Long id, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email){
         return ResponseEntity.ok(accountService.getBalance(email,id));
     }
 

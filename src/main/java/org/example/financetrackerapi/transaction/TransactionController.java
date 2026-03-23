@@ -38,7 +38,7 @@ public class TransactionController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @PostMapping
-    public ResponseEntity<TransactionResponse> create(@RequestBody @Valid TransactionRequest transactionRequest, @AuthenticationPrincipal(expression = "username") String email) {
+    public ResponseEntity<TransactionResponse> create(@RequestBody @Valid TransactionRequest transactionRequest, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.create(transactionRequest, email));
     }
 
@@ -88,7 +88,7 @@ public class TransactionController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @GetMapping("/summary")
-    public ResponseEntity<MonthlySummaryReport> getMonthlySummary(@AuthenticationPrincipal(expression = "username") String email,
+    public ResponseEntity<MonthlySummaryReport> getMonthlySummary(@Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email,
                                                                   @RequestParam int year,
                                                                   @RequestParam int month) {
         return ResponseEntity.ok(transactionService.getMonthlySummaryReport(email, year, month));
@@ -105,7 +105,7 @@ public class TransactionController {
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @GetMapping("/summary/category")
-    public ResponseEntity<List<CategorySummaryResponse>> getCategorySummary(@AuthenticationPrincipal(expression = "username") String email,
+    public ResponseEntity<List<CategorySummaryResponse>> getCategorySummary(@Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email,
                                                                       @RequestParam int year,
                                                                       @Min(1) @Max(12) @RequestParam int month) {
         return ResponseEntity.ok(transactionService.getCategorySummaryResponse(email,year,month));
