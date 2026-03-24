@@ -7,7 +7,8 @@
 
 
 
-A production-style personal finance backend built with Spring Boot, designed with real-world financial domain modeling and scalable architecture principles.
+A production-ready backend API for managing personal finances, including accounts, transactions, and authentication.
+Built with Spring Boot, PostgreSQL, Docker, and Flyway.
 
 ---
 
@@ -43,14 +44,15 @@ Transactions belong to Accounts, and Accounts belong to Users ensuring strong ow
 ## Tech Stack
 
 * ![Java](https://img.shields.io/badge/Java-17-blue)
-
 * ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3-green)
-
 * ![Spring Security](https://img.shields.io/badge/Security-JWT-yellow)
 * ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-3-brightgreen?logo=spring&logoColor=white)
-
 * ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-DB-blue)
 * ![Maven](https://img.shields.io/badge/Build-Maven-orange?logo=apachemaven)
+* ![Flyway](https://img.shields.io/badge/Flyway-Migrations-CC0200?logo=flyway&logoColor=white)
+* ![Docker](https://img.shields.io/badge/Docker-Containerization-2496ED?logo=docker&logoColor=white)
+* ![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Orchestration-2496ED?logo=docker&logoColor=white)
+* ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?logo=swagger&logoColor=black)
 
 ---
 
@@ -62,64 +64,102 @@ Transactions belong to Accounts, and Accounts belong to Users ensuring strong ow
 
 * User registration & login
 
-* Secure user-scoped queries
+* Secure, user-scoped access to all resources
 
 ### Account Management
 
-* Multiple accounts per user (Checking, Savings, Credit)
-
-* Secure ownership validation
-
-* Ledger-based balance calculation (derived from transactions)
-
-* No stored balance field (financially correct architecture)
+- Support for multiple account types (Checking, Savings, Credit)
+- Strict ownership validation per user
+- Ledger-based balance calculation (derived from transactions)
+- No stored balance field (ensures financial accuracy)
 
 ### Transaction System
 
-* Transactions linked to accounts
+- Transactions linked to accounts
+- Category validation based on transaction type (income/expense)
+- Pagination support for large datasets
 
-* Category validation against transaction type
+### Date Filtering
+- Filter transactions:
+  - Between dates
+  - From a specific date
+  - Up to a specific date
 
-* Pagination support
+### Analytics
+- Monthly income and expense aggregation
+- Category-based monthly summaries
 
-* Date filtering:
-
-  * Between dates
-
-  * From date
-
-  * To date
-
-* Monthly income & expense aggregation
-
-* Category-based monthly summaries
-
-
-### Reporting & Analytics
-
-* Monthly summary report:
-
-  * Total income
-
-  * Total expenses
-
-  * Net balance
-
-* Expense breakdown by category (monthly)
+###  Reporting & Analytics
+- Monthly financial summary including:
+  - Total income
+  - Total expenses
+  - Net balance
+- Expense breakdown by category
 
 ### Architectural Decisions
 
-* Transactions do NOT store User directly (ownership derived via Account)
+- Transactions do **not** store User directly  
+  → Ownership is derived through Account relationships
 
-* Account balances are computed dynamically using aggregation queries
+- Account balances are **calculated dynamically**  
+  → Ensures consistency and avoids stale data
 
-* All repository queries are scoped by account.user
+- All queries are scoped using: account.user
 
-* JOIN FETCH used to prevent N+1 problems
+- `JOIN FETCH` is used to prevent N+1 query issues
 
-* Service layer handles business validation logic
+- Business logic and validations are handled in the **service layer**
 
 ---
+
+### How to Run
+
+#### Running the Application
+
+### Prerequisites
+- Docker installed
+
+### Run with Docker
+
+```bash
+  docker compose up --build
+```
+
+App will be available at:
+http://localhost:8080
+
+Swagger UI:
+http://localhost:8080/swagger-ui/index.html
+
+
+---
+
+## API Example
+
+
+### Example API Endpoints
+
+### Create Account
+POST /api/v1/accounts
+
+### Get Accounts
+GET /api/v1/accounts
+
+### Get Balance
+GET /api/v1/accounts/{id}
+
+
+
+---
+
+## API Preview
+
+![Swagger UI](/.docs/swaggerScreen2.png)
+
+![Swagger UI](/.docs/swaggerScreen.png)
+
+
+___
 
 ## Current Status
 
