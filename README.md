@@ -161,42 +161,24 @@ GET /api/v1/accounts/{id}
 
 ___
 
-## Current Status
+## Project Status
 
-* Core financial domain complete:
-
-* Authentication
-
-* Accounts
-
-* Transactions
-
-* Categories
-
-* Monthly reporting
-
-System supports multi-account financial tracking with proper ownership boundaries.
+✅ Fully functional backend API  
+✅ Dockerized and production-ready  
+✅ Database migrations managed with Flyway  
+✅ Interactive API documentation with Swagger
 
 ---
 
-## Next Planned Enhancements
+## Future Enhancements
 
-* Budget tracking per category
-
-* Account transfers (account-to-account)
-
-* Global exception handler
-
-* API documentation (OpenAPI / Swagger)
-
-* Docker support
-
-* Test coverage (unit & integration tests)
-
-* Caching optimization for heavy aggregations
+- Budget tracking per category
+- Account transfers (account-to-account)
+- Caching optimization for heavy aggregations
+- Improved test coverage (unit & integration tests)
 
 ---
 
 ## Status
 
-In development — built as part of a professional backend portfolio.
+In development.
