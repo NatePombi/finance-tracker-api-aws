@@ -1,9 +1,9 @@
 # Finance Tracker API (AWS Deployed)
-[![codecov](https://codecov.io/gh/NatePombi/finance-tracker-api/graph/badge.svg?token=WSUBYBXDIB)](https://codecov.io/gh/NatePombi/finance-tracker-api)
+[![codecov](https://codecov.io/gh/NatePombi/finance-tracker-api/graph/badge.svg?token=WSUBYBXDIB)](https://codecov.io/gh/NatePombi/finance-tracker-api-aws)
 ![Java](https://img.shields.io/badge/Java-17-blue)
 ![Build](https://github.com/NatePombi/finance-tracker-api/actions/workflows/test.yml/badge.svg)
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-3.5.6-green)
-![Last Commit](https://img.shields.io/github/last-commit/NatePombi/finance-tracker-api)
+![Last Commit](https://img.shields.io/github/last-commit/NatePombi/finance-tracker-api-aws)
 
 
 
