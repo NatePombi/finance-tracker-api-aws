@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.example.financetrackerapi.ai.AiResponse;
+import org.example.financetrackerapi.ai.AiService;
 import org.example.financetrackerapi.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
+    private final AiService service;
 
     @Operation(summary = "Create a new Transactions",
                 description = "Creates a financial transactions for authenticated User")
@@ -110,5 +113,7 @@ public class TransactionController {
                                                                       @Min(1) @Max(12) @RequestParam int month) {
         return ResponseEntity.ok(transactionService.getCategorySummaryResponse(email,year,month));
     }
+
+
 
 }

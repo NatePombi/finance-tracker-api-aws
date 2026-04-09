@@ -69,6 +69,18 @@ public interface TransactionRepository extends JpaRepository<Transaction,Long> {
     Page<Transaction> findAllByAccountUserToDate(@Param("user") User user,@Param("date") LocalDate date,Pageable pageable);
 
     @Query(value = """
+            SELECT t
+             FROM  Transaction t
+             JOIN FETCH t.account
+             JOIN FETCH t.category 
+             WHERE t.account.user = :user
+            
+""")
+
+    List<Transaction> findAllByAccountUser(@Param("user") User user);
+
+
+    @Query(value = """
         SELECT  t 
         FROM Transaction t
         JOIN FETCH t.account

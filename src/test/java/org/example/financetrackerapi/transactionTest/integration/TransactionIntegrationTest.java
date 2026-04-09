@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.financetrackerapi.account.Account;
 import org.example.financetrackerapi.account.AccountRepository;
 import org.example.financetrackerapi.account.AccountType;
+import org.example.financetrackerapi.ai.AiService;
 import org.example.financetrackerapi.category.Category;
 import org.example.financetrackerapi.category.CategoryRepository;
 import org.example.financetrackerapi.category.CategoryType;
@@ -58,6 +59,7 @@ public class TransactionIntegrationTest {
     private TransactionService transactionService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
 
 
     private User testUser;
@@ -309,15 +311,18 @@ public class TransactionIntegrationTest {
         Transaction tran2 = Transaction.createTransaction(new BigDecimal(200),TransactionType.DEBIT,LocalDate.now(),"From FoodLovers",testAccount,testCategory2);
         Transaction tran3 = Transaction.createTransaction(new BigDecimal(400),TransactionType.DEBIT,LocalDate.now(),"From FoodLovers",testAccount,testCategory2);
 
+        LocalDate date = LocalDate.now();
+
+
         transactionRepository.save(tran1);
         transactionRepository.save(tran2);
         transactionRepository.save(tran3);
 
-        MonthlySummaryReport report = transactionService.getMonthlySummaryReport("test@gmail.com",2026,3);
+        MonthlySummaryReport report = transactionService.getMonthlySummaryReport("test@gmail.com",date.getYear(),date.getMonth().getValue());
 
         mockMvc.perform(get("/api/v1/transactions/summary")
-                .param("year","2026")
-                .param("month","3")
+                .param("year","%s".formatted(date.getYear()))
+                .param("month","%s".formatted(date.getMonth().getValue()))
                 .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -325,8 +330,8 @@ public class TransactionIntegrationTest {
         assertThat(report.totalIncome()).isEqualByComparingTo("1200.00");
         assertThat(report.totalExpense()).isEqualByComparingTo("600.00");
         assertThat(report.totalBalance()).isEqualByComparingTo("600.00");
-        assertThat(report.year()).isEqualTo(2026);
-        assertThat(report.month()).isEqualTo(3);
+        assertThat(report.year()).isEqualTo(date.getYear());
+        assertThat(report.month()).isEqualTo(date.getMonth().getValue());
 
    }
 
@@ -359,15 +364,17 @@ public class TransactionIntegrationTest {
        Transaction tran2 = Transaction.createTransaction(new BigDecimal(200),TransactionType.DEBIT,LocalDate.now(),"From FoodLovers",testAccount,testCategory2);
        Transaction tran3 = Transaction.createTransaction(new BigDecimal(400),TransactionType.DEBIT,LocalDate.now(),"From FoodLovers",testAccount,testCategory2);
 
+       LocalDate date = LocalDate.now();
+
        transactionRepository.save(tran1);
        transactionRepository.save(tran2);
        transactionRepository.save(tran3);
 
-        List<CategorySummaryResponse> responseList = transactionService.getCategorySummaryResponse("test@gmail.com",2026,3);
+        List<CategorySummaryResponse> responseList = transactionService.getCategorySummaryResponse("test@gmail.com",date.getYear(),date.getMonth().getValue());
 
         mockMvc.perform(get("/api/v1/transactions/summary/category")
-                .param("year","2026")
-                .param("month","3")
+                .param("year","%s".formatted(date.getYear()))
+                .param("month","%s".formatted(date.getMonth().getValue()))
                 .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -397,5 +404,7 @@ public class TransactionIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isBadRequest());
    }
+
+
 
 }

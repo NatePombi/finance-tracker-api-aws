@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.With;
 import org.example.financetrackerapi.account.AccountType;
+import org.example.financetrackerapi.ai.AiService;
 import org.example.financetrackerapi.auth.JwtService;
 import org.example.financetrackerapi.transaction.*;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -52,6 +52,7 @@ public class TransactionControllerTest {
         public TransactionService transactionService(){
             return mock(TransactionService.class);
         }
+
 
         @Bean
         public JwtService jwtService(){
@@ -314,6 +315,8 @@ public class TransactionControllerTest {
                 .with(csrf()))
                 .andExpect(status().isBadRequest());
     }
+
+
 
 
 }

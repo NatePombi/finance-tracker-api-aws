@@ -21,6 +21,8 @@ spring:
   flyway:
     community-db-support-enabled: false
     enabled: false
+  sendgrid:
+    api-key: ${API_KEY:test-key}
 
 logging:
   level:
