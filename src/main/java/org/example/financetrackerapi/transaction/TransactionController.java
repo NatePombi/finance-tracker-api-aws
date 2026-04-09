@@ -28,7 +28,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
-    private final AiService service;
 
     @Operation(summary = "Create a new Transactions",
                 description = "Creates a financial transactions for authenticated User")
