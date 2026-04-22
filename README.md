@@ -6,12 +6,14 @@
 ![Last Commit](https://img.shields.io/github/last-commit/NatePombi/finance-tracker-api-aws)
 
 
+A production-ready RESTful API for managing personal finances, including accounts, transactions, and authentication. The system is built with Spring Boot and deployed on AWS, following a layered architecture (Controller → Service → Repository) to ensure maintainability, scalability, and separation of concerns.
 
-A production-ready RESTful API for managing personal finances, including accounts, transactions, and authentication.
+It models real-world financial operations with a strong focus on data integrity, security (JWT authentication), and database consistency (PostgreSQL + Flyway migrations).
 
-The application is built using Spring Boot and deployed on AWS, making it accessible over the internet. It models real-world financial systems with strong data integrity, scalability, and clean architecture.
+In addition to core financial features, the system integrates AI-powered financial analysis via external APIs, enabling users to receive insights into their spending behavior, detect unusual spending patterns, and get data-driven saving recommendations based on actual transaction history.
 
 ---
+
 
 ## Cloud Architecture
 
@@ -21,6 +23,18 @@ Client -> AWS EC2 -> AWS RDS (PostgreSQL Database)
 - Application hosted on AWS EC2
 - Database managed via AWS RDS
 - Secure configuration using environment variables
+
+---
+
+## How AI Integration Works
+
+### User triggers analysis endpoint:
+- GET /ai/analyze
+
+  - Backend retrieves user transactions from the database
+  -  Transactions are converted into structured text
+   - A prompt is generated and sent to the AI API
+   - AI returns financial insights, which are sent back to the user
 
 ---
 
@@ -67,6 +81,7 @@ Transactions belong to Accounts, and Accounts belong to Users ensuring strong ow
 * ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?logo=swagger&logoColor=black)
 * ![AWS EC2](https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws)
 * ![AWS RDS](https://img.shields.io/badge/AWS-RDS-527FFF?style=for-the-badge&logo=amazonrds)
+* ![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-blue?logo=google&logoColor=white)
 
 ---
 
@@ -126,25 +141,26 @@ Transactions belong to Accounts, and Accounts belong to Users ensuring strong ow
 
 ---
 
-## Live API
-
-P.S: edit this for your own Public IPs
-
-swagger UI: http://13.53.122.191:8080/swagger-ui/index.html
-
-
----
-
 ##   How to Run
 
 
-#### Running the Application
+#### Running Project Locally
 
-### Prerequisites
-- Docker installed
-- AWS Credentials (if Deploying)
+1. Clone repository
+```bash
+  git clone git@github.com:NatePombi/Finance-Tracker-API.git
+  cd Finance-Tracker-API
+```
 
-### Run Locally
+2. Create .env file
+```bash
+  DB_URL=jdbc:postgresql://localhost:5432/financetracker
+  DB_USERNAME=postgres
+  DB_PASSWORD=yourpassword
+  API_KEY=your_sendgrid_api_key
+```
+
+3. Run Locally
 
 ```bash
   docker compose up --build
@@ -156,18 +172,92 @@ http://localhost:8080
 Swagger UI:
 http://localhost:8080/swagger-ui/index.html
 
+---
 
+## Docker Setup
+
+* Build Image
+  ```bash
+  docker build -t finance-tracker-api .
+  ```
+
+* Run container
+  ```bash
+  docker run -p 8080:8080 finance-tracker-api
+  ```
+---
+
+## CI/CD Pipeline (GitHub Actions)
+
+on every push to main or master:
+
+Pipeline does:
+* Runs tests with Maven
+* Generates JaCoCo coverage report
+* Builds JAR
+* Builds Docker
+* Pushes image to Docker Hub
+* Deploys to AWS EC2 via SSH
+---
+
+## Deployment (AWS EC2)
+1. Connect to EC2
+  ```bash
+    ssh ubuntu@your-ec2-ip
+  ```
+2. Install dependencies
+  ```bash
+    sudo apt update
+    sudo apt install docker.io docker-compose -y
+    sudo systemctl enable docker
+  ```
+3. Clone project OR create deployment folder
+```bash
+  git clone git@github.com:NatePombi/Finance-Tracker-API.git
+  cd Finance-Tracker-API
+```
+4. Create .env file on EC2
+```bash
+  nano .env
+```
+Add:
+```bash
+  DB_URL=jdbc:postgresql://db:5432/financetracker
+  DB_USERNAME=postgres
+  DB_PASSWORD=yourpassword
+  API_KEY=your_sendgrid_api_key
+```
+
+5. Run Application
+```bash
+  docker compose up -d
+```
+
+P.S: edit this for your own Public IPs
+swagger UI: http://13.53.122.191:8080/swagger-ui/index.html
+
+6. Update deployment (After new push)
+```bash
+  docker compose pull
+  docker compose down
+  docker compose up -d
+```
+Or if using CI/CD:
+* GitHub Actions will automatically redeploy via SSH
 ---
 
 ## Environment Variables
 
 This project uses environment variables for secure configuration:
 
-in application
+| Variable    | Description                  |
+| ----------- | ---------------------------- |
+| DB_URL      | PostgreSQL connection string |
+| DB_USERNAME | DB username                  |
+| DB_PASSWORD | DB password                  |
+| API_KEY     | SendGrid API key             |
+| JWT_SECRET  | Secret for JWT tokens        |
 
-DB_URL
-DB_USERNAME
-DB_PASSWORD
 
 ---
 
@@ -234,9 +324,18 @@ ___
 - Account transfers (account-to-account)
 - Caching optimization for heavy aggregations
 - Improved test coverage (unit & integration tests)
+- Kubernetes deployment 
+- Role-based access control (Admin/User)
+- Frontend integration (React/Angular)
+
 
 ---
 
 ## Status
 
 In the development phases.  
+
+---
+
+## Author
+Built by Nathan Pombi
