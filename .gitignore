@@ -22,7 +22,7 @@ Thumbs.db
 # Env files
 .env
 .env.*
-env.env
+.env
 application-local.yml
 application-dev.yml
 application.properties
