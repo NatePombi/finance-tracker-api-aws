@@ -1,11 +1,15 @@
 package org.example.financetrackerapi.categoryTest.service;
 
-import org.example.financetrackerapi.category.*;
+import org.example.financetrackerapi.category.dto.CategoryResponse;
+import org.example.financetrackerapi.category.entity.Category;
+import org.example.financetrackerapi.category.enums.CategoryType;
+import org.example.financetrackerapi.category.repository.CategoryRepository;
+import org.example.financetrackerapi.category.service.CategoryService;
 import org.example.financetrackerapi.exception.CategoryNameAlreadyExistsException;
 import org.example.financetrackerapi.exception.CategoryNameEmptyException;
 import org.example.financetrackerapi.exception.CategoryNotFoundException;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.user.entity.User;
+import org.example.financetrackerapi.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

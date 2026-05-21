@@ -1,9 +1,8 @@
 package org.example.financetrackerapi.ai.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.financetrackerapi.ai.AiController;
-import org.example.financetrackerapi.ai.AiService;
-import org.example.financetrackerapi.auth.JwtService;
+import org.example.financetrackerapi.ai.service.AiService;
+import org.example.financetrackerapi.auth.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

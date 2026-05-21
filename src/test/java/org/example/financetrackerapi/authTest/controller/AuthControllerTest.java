@@ -1,11 +1,13 @@
 package org.example.financetrackerapi.authTest.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.financetrackerapi.auth.*;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import org.example.financetrackerapi.auth.controller.AuthController;
+import org.example.financetrackerapi.auth.dto.AuthResponse;
+import org.example.financetrackerapi.auth.dto.LoginRequest;
+import org.example.financetrackerapi.auth.dto.LoginResponse;
+import org.example.financetrackerapi.auth.dto.RegisterRequest;
+import org.example.financetrackerapi.auth.service.AuthService;
+import org.example.financetrackerapi.auth.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,10 +15,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;

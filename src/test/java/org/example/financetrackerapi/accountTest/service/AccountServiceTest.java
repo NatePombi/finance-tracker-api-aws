@@ -1,9 +1,15 @@
 package org.example.financetrackerapi.accountTest.service;
 
-import org.example.financetrackerapi.account.*;
-import org.example.financetrackerapi.transaction.TransactionRepository;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.account.dto.AccountRequest;
+import org.example.financetrackerapi.account.dto.AccountResponse;
+import org.example.financetrackerapi.account.dto.BalanceResponse;
+import org.example.financetrackerapi.account.entity.Account;
+import org.example.financetrackerapi.account.enums.AccountType;
+import org.example.financetrackerapi.account.repository.AccountRepository;
+import org.example.financetrackerapi.account.service.AccountService;
+import org.example.financetrackerapi.transaction.repository.TransactionRepository;
+import org.example.financetrackerapi.user.entity.User;
+import org.example.financetrackerapi.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

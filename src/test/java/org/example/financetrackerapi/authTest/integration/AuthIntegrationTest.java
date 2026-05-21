@@ -1,10 +1,10 @@
 package org.example.financetrackerapi.authTest.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.financetrackerapi.auth.LoginRequest;
-import org.example.financetrackerapi.auth.RegisterRequest;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.auth.dto.LoginRequest;
+import org.example.financetrackerapi.auth.dto.RegisterRequest;
+import org.example.financetrackerapi.user.entity.User;
+import org.example.financetrackerapi.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
