@@ -1,9 +1,13 @@
 package org.example.financetrackerapi.categoryTest.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.financetrackerapi.category.*;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.category.dto.CategoryRequest;
+import org.example.financetrackerapi.category.entity.Category;
+import org.example.financetrackerapi.category.enums.CategoryType;
+import org.example.financetrackerapi.category.repository.CategoryRepository;
+import org.example.financetrackerapi.category.service.CategoryService;
+import org.example.financetrackerapi.user.entity.User;
+import org.example.financetrackerapi.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,16 +1,14 @@
 package org.example.financetrackerapi.ai.service;
 
-import org.example.financetrackerapi.account.Account;
-import org.example.financetrackerapi.account.AccountType;
-import org.example.financetrackerapi.ai.AiService;
-import org.example.financetrackerapi.category.Category;
-import org.example.financetrackerapi.category.CategoryType;
-import org.example.financetrackerapi.transaction.Transaction;
-import org.example.financetrackerapi.transaction.TransactionRepository;
-import org.example.financetrackerapi.transaction.TransactionResponse;
-import org.example.financetrackerapi.transaction.TransactionType;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.account.entity.Account;
+import org.example.financetrackerapi.account.enums.AccountType;
+import org.example.financetrackerapi.category.entity.Category;
+import org.example.financetrackerapi.category.enums.CategoryType;
+import org.example.financetrackerapi.transaction.entity.Transaction;
+import org.example.financetrackerapi.transaction.repository.TransactionRepository;
+import org.example.financetrackerapi.transaction.enums.TransactionType;
+import org.example.financetrackerapi.user.entity.User;
+import org.example.financetrackerapi.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

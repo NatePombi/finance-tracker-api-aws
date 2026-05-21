@@ -1,12 +1,11 @@
 package org.example.financetrackerapi.authTest.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import org.example.financetrackerapi.auth.JwtService;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRole;
+import org.example.financetrackerapi.auth.service.JwtService;
+import org.example.financetrackerapi.user.entity.User;
+import org.example.financetrackerapi.user.enums.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 

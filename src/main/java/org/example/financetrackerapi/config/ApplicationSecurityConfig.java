@@ -1,7 +1,7 @@
 package org.example.financetrackerapi.config;
 
 import lombok.AllArgsConstructor;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

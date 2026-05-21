@@ -1,10 +1,14 @@
 package org.example.financetrackerapi.accountTest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.financetrackerapi.account.*;
-import org.example.financetrackerapi.auth.JwtService;
-import org.example.financetrackerapi.user.User;
-import org.junit.jupiter.api.BeforeEach;
+import org.example.financetrackerapi.account.controller.AccountController;
+import org.example.financetrackerapi.account.dto.AccountRequest;
+import org.example.financetrackerapi.account.dto.AccountResponse;
+import org.example.financetrackerapi.account.dto.BalanceResponse;
+import org.example.financetrackerapi.account.enums.AccountType;
+import org.example.financetrackerapi.account.service.AccountService;
+import org.example.financetrackerapi.auth.service.JwtService;
+import org.example.financetrackerapi.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

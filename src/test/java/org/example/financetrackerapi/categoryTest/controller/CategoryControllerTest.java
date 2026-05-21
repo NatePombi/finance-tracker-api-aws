@@ -1,13 +1,15 @@
 package org.example.financetrackerapi.categoryTest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.financetrackerapi.auth.JwtService;
-import org.example.financetrackerapi.category.*;
+import org.example.financetrackerapi.auth.service.JwtService;
+import org.example.financetrackerapi.category.controller.CategoryController;
+import org.example.financetrackerapi.category.dto.CategoryRequest;
+import org.example.financetrackerapi.category.dto.CategoryResponse;
+import org.example.financetrackerapi.category.enums.CategoryType;
+import org.example.financetrackerapi.category.service.CategoryService;
 import org.example.financetrackerapi.exception.CategoryNameAlreadyExistsException;
-import org.example.financetrackerapi.exception.CategoryNameEmptyException;
 import org.example.financetrackerapi.exception.CategoryNotFoundException;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

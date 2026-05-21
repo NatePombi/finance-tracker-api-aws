@@ -1,9 +1,14 @@
 package org.example.financetrackerapi.authTest.service;
 
-import org.example.financetrackerapi.auth.*;
+import org.example.financetrackerapi.auth.dto.AuthResponse;
+import org.example.financetrackerapi.auth.dto.LoginRequest;
+import org.example.financetrackerapi.auth.dto.LoginResponse;
+import org.example.financetrackerapi.auth.dto.RegisterRequest;
+import org.example.financetrackerapi.auth.service.AuthService;
+import org.example.financetrackerapi.auth.service.JwtService;
 import org.example.financetrackerapi.exception.EmailAlreadyExistException;
-import org.example.financetrackerapi.user.User;
-import org.example.financetrackerapi.user.UserRepository;
+import org.example.financetrackerapi.user.entity.User;
+import org.example.financetrackerapi.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
