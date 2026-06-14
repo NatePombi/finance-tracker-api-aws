@@ -55,7 +55,7 @@ public class AuthControllerTest {
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldRegisterUser_Sucecefully() throws Exception {
         RegisterRequest request = new RegisterRequest("test@gmail.com","testPass");
-        AuthResponse response = new AuthResponse("test@gmail.com","testPass");
+        AuthResponse response = new AuthResponse(1L,"test@gmail.com","testPass");
         when(service.register(any(RegisterRequest.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/auth/register")
