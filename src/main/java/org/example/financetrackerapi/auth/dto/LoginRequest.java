@@ -13,10 +13,10 @@ import lombok.Getter;
 public class LoginRequest {
     @Email
     @Schema(description = "Email that you registered with", example = "test@gmail.com")
+    @Email(message = "Invalid email format")
     @NotBlank(message = "Email cannot be empty")
     private String email;
     @Schema(description = "Password that you registered with", example = "testPass123")
-    @NotBlank(message = "Password cannot be empty")
-    @Size(min = 6)
+    @Size(min = 7, message = "Password must be at lease 7 characters long")
     private String password;
 }
