@@ -119,14 +119,14 @@ public class TransactionIntegrationTest {
 
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
-    void shouldFailCreateTransaction_BadCredentials() throws Exception {
+    void shouldFailCreateTransaction_BadRequest() throws Exception {
         TransactionRequest request = new TransactionRequest(new BigDecimal(2000), null,1L,1L, LocalDate.now(),"Deposit to Savings");
 
         mockMvc.perform(post("/api/v1/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
 
     }
 
@@ -140,7 +140,7 @@ public class TransactionIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

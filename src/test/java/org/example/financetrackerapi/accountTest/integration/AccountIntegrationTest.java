@@ -13,6 +13,7 @@ import org.example.financetrackerapi.transaction.repository.TransactionRepositor
 import org.example.financetrackerapi.transaction.enums.TransactionType;
 import org.example.financetrackerapi.user.entity.User;
 import org.example.financetrackerapi.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -39,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
 public class AccountIntegrationTest {
     @Autowired
@@ -57,23 +57,47 @@ public class AccountIntegrationTest {
     @Autowired
     private PasswordEncoder encoder;
 
+    private User testUser;
+    private Account testAccount1;
+    private Account testAccount2;
+
+    @BeforeEach
+    void startUp(){
+        testUser = User.create("test@gmail.com",encoder.encode("test"));
+        userRepository.save(testUser);
+
+        testAccount1 = Account.create("Savings Account", AccountType.SAVINGS, testUser);
+        testAccount2 = Account.create("Credit Account", AccountType.CREDIT, testUser);
+        accountRepository.save(testAccount1);
+        accountRepository.save(testAccount2);
+
+    }
+
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldCreateAccount() throws Exception {
-        User user = User.create("test@gmail.com",encoder.encode("test"));
-        userRepository.save(user);
-        AccountRequest request = new AccountRequest("Saving Account", AccountType.SAVINGS);
+        AccountRequest request = new AccountRequest("Saving Account 2", AccountType.SAVINGS);
 
         mockMvc.perform(post("/api/v1/accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request))
-                .with(csrf()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request))
+                        .with(csrf()))
                 .andExpect(status().isCreated());
 
-        assertThat(request).isNotNull();
+        List<Account> accs = accountRepository.findByUserEmail("test@gmail.com");
 
-        assertThat(request.getAccountName()).isEqualTo("Saving Account");
-        assertThat(request.getAccountType()).isEqualTo(AccountType.SAVINGS);
+
+        assertThat(accs.size()).isEqualTo(3);
+
+        Account saved = accountRepository.findByNameAndUserEmail("Saving Account 2", "test@gmail.com");
+
+        assertThat(saved).isNotNull();
+
+        assertThat(saved.getName()).isEqualTo("Saving Account 2");
+        assertThat(saved.getAccountType()).isEqualTo(AccountType.SAVINGS);
+        assertThat(saved.getUser()).isEqualTo(testUser);
+
+
     }
 
     @Test
@@ -89,48 +113,36 @@ public class AccountIntegrationTest {
 
     @Test
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
-    void shouldFailCreateAccount_BadCredentials() throws Exception {
+    void shouldFailCreateAccount_BadRequest() throws Exception {
         AccountRequest request = new AccountRequest(null, AccountType.SAVINGS);
 
         mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
 
     @Test
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
     void shouldGetAllUserAccounts() throws Exception {
-        User user = User.create("test@gmail.com",encoder.encode("test"));
-        userRepository.save(user);
-
-        Account account = Account.create("Savings Account", AccountType.SAVINGS, user);
-        Account account1 = Account.create("Credit Account", AccountType.CREDIT, user);
-        accountRepository.save(account);
-        accountRepository.save(account1);
-
         mockMvc.perform(get("/api/v1/accounts")
                 .with(csrf()))
                 .andExpect(status().isOk());
 
-        List<Account> accounts = accountRepository.findAll();
+        List<Account> accounts = accountRepository.findByUserEmail("test@gmail.com");
 
         assertThat(accounts.size()).isEqualTo(2);
-        assertThat(accounts.get(0)).isEqualTo(account);
-        assertThat(accounts.get(1)).isEqualTo(account1);
+
+
+
+        assertThat(accountRepository.findByNameAndUserEmail("Savings Account","test@gmail.com")).isEqualTo(testAccount1);
+        assertThat(accountRepository.findByNameAndUserEmail("Credit Account","test@gmail.com")).isEqualTo(testAccount2);
     }
 
     @Test
     void shouldFailToGetAllUserAccounts_NotLoggedIn() throws Exception {
-        User user = User.create("test@gmail.com",encoder.encode("test"));
-        userRepository.save(user);
-
-        Account account = Account.create("Savings Account", AccountType.SAVINGS, user);
-        Account account1 = Account.create("Credit Account", AccountType.CREDIT, user);
-        accountRepository.save(account);
-        accountRepository.save(account1);
 
         mockMvc.perform(get("/api/v1/accounts"))
                 .andExpect(status().isUnauthorized());
@@ -141,22 +153,19 @@ public class AccountIntegrationTest {
     @Test
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
     void shouldGetAccountBalance() throws Exception {
-        User user = User.create("test@gmail.com",encoder.encode("test"));
-        userRepository.save(user);
-
-
-        Account account = Account.create("Savings Account", AccountType.SAVINGS, user);
-        accountRepository.save(account);
-
-        Category category = Category.createCategory("savings", CategoryType.CREDIT,user);
+        Category category = Category.createCategory("savings", CategoryType.CREDIT,testUser);
         categoryRepository.save(category);
 
-        Transaction transaction =Transaction.createTransaction(BigDecimal.valueOf(4000), TransactionType.CREDIT, LocalDate.now(),"Bought Laptop",account,category);
+        Transaction transaction =Transaction.createTransaction(BigDecimal.valueOf(4000), TransactionType.CREDIT, LocalDate.now(),"Bought Laptop",testAccount1,category);
         transactionRepository.save(transaction);
 
+        Account acc = accountRepository.findByNameAndUserEmail("Savings Account","test@gmail.com");
 
+        assertThat(acc).isNotNull();
 
-        mockMvc.perform(get("/api/v1/accounts/1")
+        Long id = acc.getId();
+
+        mockMvc.perform(get("/api/v1/accounts/{id}/balance",id)
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(4000));

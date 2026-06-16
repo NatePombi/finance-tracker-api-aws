@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, jakarta.servlet.http.HttpServletRequest req){
         String msg = ex.getBindingResult().getAllErrors().stream()
                 .map(e-> {
@@ -98,6 +98,13 @@ public class GlobalExceptionHandler {
     public ApiError handlesCategoryEmptyException(CategoryNameEmptyException ex, jakarta.servlet.http.HttpServletRequest req){
         return new ApiError(Instant.now(),HttpStatus.BAD_REQUEST.value(), "Category Name Empty",ex.getMessage(),req.getRequestURI());
     }
+
+    @ExceptionHandler(AccountTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handlesAccountTypeMismatch(AccountTypeMismatchException ex, jakarta.servlet.http.HttpServletRequest req){
+        return new ApiError(Instant.now(),HttpStatus.CONFLICT.value(), "Account Type Mismatch",ex.getMessage(),req.getRequestURI());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleException(Exception ex, jakarta.servlet.http.HttpServletRequest request) {

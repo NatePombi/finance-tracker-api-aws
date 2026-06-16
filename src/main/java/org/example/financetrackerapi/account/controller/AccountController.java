@@ -9,8 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.financetrackerapi.account.dto.AccountRequest;
 import org.example.financetrackerapi.account.dto.AccountResponse;
-import org.example.financetrackerapi.account.service.AccountService;
 import org.example.financetrackerapi.account.dto.BalanceResponse;
+import org.example.financetrackerapi.account.service.IAccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
 public class AccountController {
-    private final AccountService accountService;
+    private final IAccountService accountService;
 
     @Operation(summary = "Create a new Accounts",
             description = "Creates an Account for authenticated User")
@@ -30,7 +30,6 @@ public class AccountController {
             @ApiResponse(responseCode = "201", description = "Account created Successfully"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Not Found"),
             @ApiResponse(responseCode = "409", description = "Conflict"),
             @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
@@ -45,9 +44,6 @@ public class AccountController {
             @ApiResponse(responseCode = "200", description = "Get Account Successfully"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Not Found"),
-            @ApiResponse(responseCode = "409", description = "Conflict"),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
     @GetMapping
     public ResponseEntity<List<AccountResponse>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
@@ -61,10 +57,8 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Not Found"),
-            @ApiResponse(responseCode = "409", description = "Conflict"),
-            @ApiResponse(responseCode = "422", description = "Unprocessable Entity")
     })
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/balance")
     public ResponseEntity<BalanceResponse> getBalance(@Parameter(description = "Account ID") @PathVariable Long id, @Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email){
         return ResponseEntity.ok(accountService.getBalance(email,id));
     }

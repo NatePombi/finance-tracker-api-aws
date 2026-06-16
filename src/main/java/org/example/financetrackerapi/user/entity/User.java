@@ -46,6 +46,12 @@ public class User implements UserDetails {
         return user;
     }
 
+    User(Long id,String email,String hashPassword){
+        this.id = id;
+        this.email = email;
+        this.password = hashPassword;
+    }
+
     public void changeRole(UserRole newRole) {
         this.role = newRole;
     }
