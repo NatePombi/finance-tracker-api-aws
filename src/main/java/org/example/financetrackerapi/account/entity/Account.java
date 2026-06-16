@@ -15,7 +15,7 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -25,12 +25,27 @@ public class Account {
     private User user;
 
     public static Account create(String name,AccountType accountType, User user) {
+
+        if(name == null || name.isBlank()){
+            throw new IllegalArgumentException("Name cannot be null or empty");
+        }
+
         Account account = new Account();
         account.name = name;
         account.accountType = accountType;
         account.user = user;
         return account;
     }
+
+   Account (Long id ,String name,AccountType accountType, User user) {
+        this.id = id;
+        this.name = name;
+        this.accountType = accountType;
+        this.user = user;
+
+    }
+
+
 
 
 }

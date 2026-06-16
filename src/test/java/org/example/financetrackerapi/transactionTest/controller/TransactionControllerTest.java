@@ -67,7 +67,7 @@ public class TransactionControllerTest {
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldCreateTransaction() throws Exception {
         TransactionRequest request = new TransactionRequest(new BigDecimal(1200), TransactionType.DEBIT,1L,1L, LocalDate.now(),"Bought groceries");
-        TransactionResponse response = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries",request.getDescription(),1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries",request.getDescription(),1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
         when(service.create(request,"test@gmail.com")).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/transactions")
@@ -87,7 +87,7 @@ public class TransactionControllerTest {
 
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
-    void shouldFailCreateTransaction_BadCredentials() throws Exception {
+    void shouldFailCreateTransaction_BadRequest() throws Exception {
         TransactionRequest request = new TransactionRequest(new BigDecimal(1200), null,1L,1L, LocalDate.now(),"Bought groceries");
 
 
@@ -95,7 +95,7 @@ public class TransactionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
                         .with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -108,15 +108,15 @@ public class TransactionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
                         .with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
     void shouldGetTransactions() throws Exception {
-        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
-        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
-        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
 
         List<TransactionResponse> list = List.of(response1,response2,response3);
         Page<TransactionResponse> page = new PageImpl<>(list);
@@ -145,9 +145,9 @@ public class TransactionControllerTest {
     void shouldGetTransactions_ByDate() throws Exception {
         LocalDateTime created  = LocalDateTime.of(2026, 2, 9, 14, 30);
 
-        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CASH,LocalDate.of(2026,2,9),created);
-        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
-        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CREDIT,LocalDate.of(2026,2,9),created);
+        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
 
         List<TransactionResponse> list = List.of(response1,response2,response3);
         Page<TransactionResponse> page = new PageImpl<>(list);
@@ -170,9 +170,9 @@ public class TransactionControllerTest {
     void shouldGetTransactions_FromDate() throws Exception {
         LocalDateTime created  = LocalDateTime.of(2026, 2, 9, 14, 30);
 
-        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CASH,LocalDate.of(2026,2,9),created);
-        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
-        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CREDIT,LocalDate.of(2026,2,9),created);
+        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
 
         List<TransactionResponse> list = List.of(response1,response2,response3);
         Page<TransactionResponse> page = new PageImpl<>(list);
@@ -196,9 +196,9 @@ public class TransactionControllerTest {
     void shouldGetTransactions_ToDate() throws Exception {
         LocalDateTime created  = LocalDateTime.of(2026, 2, 9, 14, 30);
 
-        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CASH,LocalDate.of(2026,2,9),created);
-        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
-        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CASH,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response1 = new TransactionResponse(22L,new BigDecimal(1200),TransactionType.DEBIT,"Groceries","from woolworths",1L, AccountType.CREDIT,LocalDate.of(2026,2,9),created);
+        TransactionResponse response2 = new TransactionResponse(23L,new BigDecimal(600),TransactionType.DEBIT,"Groceries","from FoodLovers",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
+        TransactionResponse response3 = new TransactionResponse(24L,new BigDecimal(100),TransactionType.DEBIT,"Groceries","from Pick n Pay",1L, AccountType.CREDIT,LocalDate.now(),LocalDateTime.now());
 
         List<TransactionResponse> list = List.of(response1,response2,response3);
         Page<TransactionResponse> page = new PageImpl<>(list);

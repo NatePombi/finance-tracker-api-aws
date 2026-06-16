@@ -5,10 +5,15 @@ import org.example.financetrackerapi.account.controller.AccountController;
 import org.example.financetrackerapi.account.dto.AccountRequest;
 import org.example.financetrackerapi.account.dto.AccountResponse;
 import org.example.financetrackerapi.account.dto.BalanceResponse;
+import org.example.financetrackerapi.account.entity.Account;
+import org.example.financetrackerapi.account.entity.TestAccount;
 import org.example.financetrackerapi.account.enums.AccountType;
 import org.example.financetrackerapi.account.service.AccountService;
 import org.example.financetrackerapi.auth.service.JwtService;
+import org.example.financetrackerapi.exception.AccountNotFoundException;
+import org.example.financetrackerapi.user.entity.TestUser;
 import org.example.financetrackerapi.user.entity.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,13 +23,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,7 +66,7 @@ public class AccountControllerTest {
         AccountRequest request = new AccountRequest("Savings Account", AccountType.SAVINGS);
         AccountResponse response = new AccountResponse(1L,"Savings Account",AccountType.SAVINGS,2L);
 
-        when(service.create(any(AccountRequest.class),any())).thenReturn(response);
+        when(service.create(any(AccountRequest.class),eq("test@gmail.com"))).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -71,95 +76,83 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$.name").value("Savings Account"))
                 .andExpect(jsonPath("$.accountType").value(AccountType.SAVINGS.toString()));
 
+        verify(service).create(any(AccountRequest.class),eq("test@gmail.com"));
+
     }
 
 
     @Test
     @WithMockUser(username = "test@gmail.com", roles = {"USER"})
-    void shouldFailToCreateAccount_BadCredentials() throws Exception {
+    void shouldFailToCreateAccount_BadRequest() throws Exception {
         AccountRequest request = new AccountRequest(null, AccountType.SAVINGS);
-        AccountResponse response = new AccountResponse(1L,"Savings Account",AccountType.SAVINGS,2L);
 
-        when(service.create(any(AccountRequest.class),any())).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
                 .with(csrf()))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
 
     }
 
     @Test
     void shouldFailToCreateAccount_NotLoggedInUser() throws Exception {
-        AccountRequest request = new AccountRequest("test@gmail.com", AccountType.SAVINGS);
-        AccountResponse response = new AccountResponse(1L,"Savings Account",AccountType.SAVINGS,2L);
-
-        when(service.create(any(AccountRequest.class),any())).thenReturn(response);
-
         mockMvc.perform(post("/api/v1/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request))
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
 
+
+
     @Test
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
     void shouldGetUserAccounts() throws Exception {
-        User testUser = User.create("test@gmail.com","testPass");
         AccountResponse response1 = new AccountResponse(1L,"Savings Account",AccountType.SAVINGS,2L);
         AccountResponse response2 = new AccountResponse(2L,"Credit Account",AccountType.CREDIT,2L);
         List<AccountResponse> responses = List.of(response1,response2);
 
-        when(service.getAccounts(testUser.getEmail())).thenReturn(responses);
+        when(service.getAccounts("test@gmail.com")).thenReturn(responses);
 
-        mockMvc.perform(get("/api/v1/accounts")
-                .with(csrf()))
+        mockMvc.perform(get("/api/v1/accounts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Savings Account"))
                 .andExpect(jsonPath("$[0].accountType").value(AccountType.SAVINGS.toString()))
                 .andExpect(jsonPath("$[1].name").value("Credit Account"))
                 .andExpect(jsonPath("$[1].accountType").value(AccountType.CREDIT.toString()));
+
+
+        verify(service).getAccounts("test@gmail.com");
+
     }
 
 
 
     @Test
     void shouldFailGetUserAccounts_NotLoggedInUser() throws Exception {
-        User testUser = User.create("test@gmail.com","testPass");
-        AccountResponse response1 = new AccountResponse(1L,"Savings Account",AccountType.SAVINGS,2L);
-        AccountResponse response2 = new AccountResponse(2L,"Credit Account",AccountType.CREDIT,2L);
-        List<AccountResponse> responses = List.of(response1,response2);
 
-        when(service.getAccounts(testUser.getEmail())).thenReturn(responses);
-
-        mockMvc.perform(get("/api/v1/accounts")
-                .with(csrf()))
+        mockMvc.perform(get("/api/v1/accounts"))
                 .andExpect(status().isUnauthorized());
     }
 
 
     @Test
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
-    void shouldAccountBalance() throws Exception {
+    void shouldGetAccountBalance() throws Exception {
         BalanceResponse response = new BalanceResponse(BigDecimal.valueOf(550));
-        when(service.getBalance(any(),any())).thenReturn(response);
+        when(service.getBalance("test@gmail.com",1L)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/accounts/1")
-                .with(csrf()))
+        mockMvc.perform(get("/api/v1/accounts/1/balance"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(550));
+
+        verify(service).getBalance("test@gmail.com",1L);
     }
 
     @Test
     void shouldFailToGetAccountBalance_NotLoggedIn() throws Exception {
-        BalanceResponse response = new BalanceResponse(BigDecimal.valueOf(550));
-        when(service.getBalance(any(),any())).thenReturn(response);
-
-        mockMvc.perform(get("/api/v1/accounts/1")
-                        .with(csrf()))
+        mockMvc.perform(get("/api/v1/accounts/1/balance"))
                 .andExpect(status().isUnauthorized());
     }
 
