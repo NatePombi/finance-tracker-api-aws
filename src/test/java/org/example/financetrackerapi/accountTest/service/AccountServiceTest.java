@@ -10,8 +10,10 @@ import org.example.financetrackerapi.account.repository.AccountRepository;
 import org.example.financetrackerapi.account.service.AccountService;
 import org.example.financetrackerapi.exception.AccountNotFoundException;
 import org.example.financetrackerapi.exception.AccountTypeMismatchException;
+import org.example.financetrackerapi.exception.AccountsNotFoundException;
 import org.example.financetrackerapi.exception.UserNotFoundException;
 import org.example.financetrackerapi.transaction.repository.TransactionRepository;
+import org.example.financetrackerapi.user.entity.TestUser;
 import org.example.financetrackerapi.user.entity.User;
 import org.example.financetrackerapi.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -48,7 +51,7 @@ public class AccountServiceTest {
 
     @BeforeEach
     void startUp(){
-        testUser = User.create("test@gmail.com","testPass");
+        testUser = new TestUser(12L,"test@gmail.com","hashed-password");
         testAccount = new TestAccount(1L,"Savings Account",AccountType.SAVINGS,testUser);
     }
 
@@ -82,24 +85,42 @@ public class AccountServiceTest {
 
    @Test
     void shouldGetAllUsersAccounts(){
-
+       Pageable pageable = PageRequest.of(0,5, Sort.by("id").descending());
         Account acc2 = new TestAccount(2L,"Credit Account",AccountType.CREDIT,testUser);
+
+        Page<Account> page = new PageImpl<>(List.of(testAccount,acc2));
 
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
 
-        when(accountRepository.findByUserEmail(testUser.getEmail())).thenReturn(List.of(testAccount,acc2));
-        List<AccountResponse> responses = service.getAccounts(testUser.getEmail());
+        when(accountRepository.findAllByUserId(testUser.getId(),pageable)).thenReturn(page);
+        Page<AccountResponse> responses = service.getAccounts(testUser.getEmail(),0,5,"id","desc");
 
         assertThat(responses).isNotNull();
-        assertThat(responses.size()).isEqualTo(2);
+        assertThat(responses.getSize()).isEqualTo(2);
+        assertThat(responses.getTotalElements()).isEqualTo(2);
+        assertThat(responses.hasNext()).isFalse();
 
-        assertThat(responses.get(0).id()).isEqualTo(testAccount.getId());
-        assertThat(responses.get(0).name()).isEqualTo(testAccount.getName());
-        assertThat(responses.get(0).accountType()).isEqualTo(testAccount.getAccountType());
+   }
 
-        assertThat(responses.get(1).id()).isEqualTo(acc2.getId());
-        assertThat(responses.get(1).name()).isEqualTo(acc2.getName());
-        assertThat(responses.get(1).accountType()).isEqualTo(acc2.getAccountType());
+   @Test
+    void shouldFailGetAllAccounts_NoAccountsPresent() {
+        Pageable pageable = PageRequest.of(0,5,Sort.by("id").descending());
+
+        when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
+        when(accountRepository.findAllByUserId(testUser.getId(),pageable)).thenReturn(null);
+
+        assertThrows(AccountsNotFoundException.class,()->{
+            service.getAccounts("test@gmail.com",0,5,"id","desc");
+        });
+
+   }
+
+   @Test
+   void shouldFailGetAllAccounts_UserNotFound() {
+
+        assertThrows(UserNotFoundException.class,()->{
+            service.getAccounts("test@gmail.com",0,5,"id","desc");
+        });
 
    }
 

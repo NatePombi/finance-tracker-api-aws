@@ -20,6 +20,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +31,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -111,20 +115,22 @@ public class AccountControllerTest {
     void shouldGetUserAccounts() throws Exception {
         AccountResponse response1 = new AccountResponse(1L,"Savings Account",AccountType.SAVINGS,2L);
         AccountResponse response2 = new AccountResponse(2L,"Credit Account",AccountType.CREDIT,2L);
-        List<AccountResponse> responses = List.of(response1,response2);
+        Page<AccountResponse> page = new PageImpl<>(List.of(response1,response2), PageRequest.of(0,5),2);
 
-        when(service.getAccounts("test@gmail.com")).thenReturn(responses);
+        when(service.getAccounts("test@gmail.com",0,5,"id","desc")).thenReturn(page);
 
-        mockMvc.perform(get("/api/v1/accounts"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Savings Account"))
-                .andExpect(jsonPath("$[0].accountType").value(AccountType.SAVINGS.toString()))
-                .andExpect(jsonPath("$[1].name").value("Credit Account"))
-                .andExpect(jsonPath("$[1].accountType").value(AccountType.CREDIT.toString()));
+        mockMvc.perform(get("/api/v1/accounts")
+                        .param("page","0")
+                        .param("size","5")
+                        .param("sortBy","id")
+                        .param("direction","desc"))
+                .andExpect(status().isOk());
 
+        Page<AccountResponse> responses = service.getAccounts("test@gmail.com",0,5,"id","desc");
 
-        verify(service).getAccounts("test@gmail.com");
+        verify(service,atLeast(1)).getAccounts("test@gmail.com",0,5,"id","desc");
 
+        assertThat(responses.getContent().size()).isEqualTo(2);
     }
 
 

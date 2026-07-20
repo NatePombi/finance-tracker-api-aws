@@ -18,6 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -26,6 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.ldap.PagedResultsControl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -63,8 +68,8 @@ public class AccountIntegrationTest {
 
     @BeforeEach
     void startUp(){
-        testUser = User.create("test@gmail.com",encoder.encode("test"));
-        userRepository.save(testUser);
+        User user  = User.create("test@gmail.com",encoder.encode("test"));
+        testUser = userRepository.save(user);
 
         testAccount1 = Account.create("Savings Account", AccountType.SAVINGS, testUser);
         testAccount2 = Account.create("Credit Account", AccountType.CREDIT, testUser);
@@ -84,10 +89,11 @@ public class AccountIntegrationTest {
                         .with(csrf()))
                 .andExpect(status().isCreated());
 
-        List<Account> accs = accountRepository.findByUserEmail("test@gmail.com");
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Account> accs = accountRepository.findAllByUserId(testUser.getId(),pageable);
 
 
-        assertThat(accs.size()).isEqualTo(3);
+        assertThat(accs.getContent().size()).isEqualTo(3);
 
         Account saved = accountRepository.findByNameAndUserEmail("Saving Account 2", "test@gmail.com");
 
@@ -128,12 +134,19 @@ public class AccountIntegrationTest {
     @WithMockUser(username = "test@gmail.com",roles = {"USER"})
     void shouldGetAllUserAccounts() throws Exception {
         mockMvc.perform(get("/api/v1/accounts")
+                        .param("page","0")
+                        .param("size","5")
+                        .param("sortBy","id")
+                        .param("direction","desc")
                 .with(csrf()))
                 .andExpect(status().isOk());
 
-        List<Account> accounts = accountRepository.findByUserEmail("test@gmail.com");
 
-        assertThat(accounts.size()).isEqualTo(2);
+
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("id").descending());
+        Page<Account> accounts = accountRepository.findAllByUserId(testUser.getId(),pageable);
+
+        assertThat(accounts.getContent().size()).isEqualTo(2);
 
 
 
@@ -144,7 +157,11 @@ public class AccountIntegrationTest {
     @Test
     void shouldFailToGetAllUserAccounts_NotLoggedIn() throws Exception {
 
-        mockMvc.perform(get("/api/v1/accounts"))
+        mockMvc.perform(get("/api/v1/accounts")
+                        .param("page","0")
+                        .param("size","5")
+                        .param("sortBy","id")
+                        .param("direction","desc"))
                 .andExpect(status().isUnauthorized());
 
     }

@@ -7,10 +7,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.financetrackerapi.account.dto.AccountPaginatedResponse;
 import org.example.financetrackerapi.account.dto.AccountRequest;
 import org.example.financetrackerapi.account.dto.AccountResponse;
 import org.example.financetrackerapi.account.dto.BalanceResponse;
+import org.example.financetrackerapi.account.entity.Account;
 import org.example.financetrackerapi.account.service.IAccountService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,8 +49,23 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
     })
     @GetMapping
-    public ResponseEntity<List<AccountResponse>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email) {
-        return ResponseEntity.ok(accountService.getAccounts(email));
+    public ResponseEntity<AccountPaginatedResponse<AccountResponse>> getAll(@Parameter(hidden = true) @AuthenticationPrincipal(expression = "username") String email,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "5") int size,
+                                                           @RequestParam(defaultValue = "id") String sortBy,
+                                                           @RequestParam(defaultValue = "desc") String direction) {
+        Page<AccountResponse> accounts = accountService.getAccounts(email,page,size,sortBy,direction);
+
+        AccountPaginatedResponse<AccountResponse> response = new AccountPaginatedResponse<>(
+                accounts.getContent(),
+                page,
+                accounts.getTotalPages(),
+                accounts.getTotalElements(),
+                accounts.hasNext()
+        );
+
+        return ResponseEntity.ok(response);
+
     }
 
     @Operation(summary = "Get Account by id",

@@ -9,17 +9,21 @@ import org.example.financetrackerapi.account.enums.AccountType;
 import org.example.financetrackerapi.account.mapper.AccountMapper;
 import org.example.financetrackerapi.account.repository.AccountRepository;
 import org.example.financetrackerapi.exception.AccountNotFoundException;
+import org.example.financetrackerapi.exception.AccountsNotFoundException;
 import org.example.financetrackerapi.exception.UserNotFoundException;
 import org.example.financetrackerapi.transaction.repository.TransactionRepository;
 import org.example.financetrackerapi.user.entity.User;
 import org.example.financetrackerapi.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,18 +70,32 @@ public class AccountService implements IAccountService{
      * Fetches List of Account of User
      *
      * @param email of User that's signed in
-     * @return List of AccountResponse of all users Accounts
+     * @return a {@link Page} of {@link AccountResponse} object
+     * @throws UserNotFoundException if given email does not belong to a User
+     * @throws AccountsNotFoundException if user does not have any accounts
      */
     @Override
-    public List<AccountResponse> getAccounts(String email) {
+    public Page<AccountResponse> getAccounts(String email,int page, int size, String sortBy,String direction) {
         log.info("Attempting to Get Accounts for user");
 
         // finds user by email, if not found throws an exception
         User user = getUser(email);
 
-        return accountRepository.findByUserEmail(email).stream()
-                .map(acc -> AccountMapper.toAccountResponse(acc,user))
-                .toList();
+        Sort sort = direction.equalsIgnoreCase("desc")?Sort.by(sortBy).descending():Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+
+
+        Page<Account> accounts = accountRepository.findAllByUserId(user.getId(),pageable);
+
+        if(accounts == null || accounts.isEmpty()){
+            log.warn("Accounts not found for user: {}", user.getEmail());
+            throw new AccountsNotFoundException("No Accounts found for user");
+        }
+
+
+        log.info("Successfully retrieved all user accounts");
+        return accounts.map(acc -> AccountMapper.toAccountResponse(acc,user));
     }
 
     /**
