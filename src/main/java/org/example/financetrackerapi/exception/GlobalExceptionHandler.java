@@ -37,6 +37,12 @@ public class GlobalExceptionHandler {
         return new ApiError(Instant.now(), HttpStatus.NOT_FOUND.value(), "Account not Found", ex.getMessage(), request.getRequestURI());
     }
 
+    @ExceptionHandler(AccountsNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleAccountNotFoundException(AccountsNotFoundException ex, jakarta.servlet.http.HttpServletRequest request) {
+        return new ApiError(Instant.now(), HttpStatus.NOT_FOUND.value(), "Account not Found", ex.getMessage(), request.getRequestURI());
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleIllegalArgumentException(IllegalArgumentException ex, jakarta.servlet.http.HttpServletRequest request) {
@@ -68,6 +74,18 @@ public class GlobalExceptionHandler {
         return new ApiError(Instant.now(),HttpStatus.CONFLICT.value(), "Email Already exists",ex.getMessage(),req.getRequestURI());
     }
 
+    @ExceptionHandler(InvalidDateRangeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handlesInvalidDateRangeException(InvalidDateRangeException ex , jakarta.servlet.http.HttpServletRequest req){
+        return new ApiError(Instant.now(), HttpStatus.BAD_REQUEST.value(), "Bad Request",ex.getMessage(), req.getRequestURI());
+    }
+
+    @ExceptionHandler(TypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handlesTypeMismatchException(TypeMismatchException ex , jakarta.servlet.http.HttpServletRequest req){
+        return new ApiError(Instant.now(), HttpStatus.BAD_REQUEST.value(), "Bad Request",ex.getMessage(), req.getRequestURI());
+    }
+
     @ExceptionHandler(CategoryNameAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handlesCategoryNameAlreadyExistsException(CategoryNameAlreadyExistsException ex, jakarta.servlet.http.HttpServletRequest req){
@@ -90,7 +108,7 @@ public class GlobalExceptionHandler {
             msg = "Validation failed";
         }
 
-        return new ApiError(Instant.now(), HttpStatus.UNPROCESSABLE_ENTITY.value(), "Unprocessable Entity", msg, req.getRequestURI());
+        return new ApiError(Instant.now(), HttpStatus.BAD_REQUEST.value(), "Bad Request", msg, req.getRequestURI());
     }
 
     @ExceptionHandler(CategoryNameEmptyException.class)

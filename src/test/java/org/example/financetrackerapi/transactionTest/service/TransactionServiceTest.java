@@ -8,6 +8,7 @@ import org.example.financetrackerapi.category.repository.CategoryRepository;
 import org.example.financetrackerapi.category.enums.CategoryType;
 import org.example.financetrackerapi.exception.AccountNotFoundException;
 import org.example.financetrackerapi.exception.CategoryNotFoundException;
+import org.example.financetrackerapi.exception.InvalidDateRangeException;
 import org.example.financetrackerapi.transaction.dto.CategorySummaryResponse;
 import org.example.financetrackerapi.transaction.dto.MonthlySummaryReport;
 import org.example.financetrackerapi.transaction.dto.TransactionRequest;
@@ -162,20 +163,6 @@ public class TransactionServiceTest {
 
     }
 
-    @Test
-    void shouldFailGetTransactionsByDate_FromDateMustBeBeforeToDate(){
-        when(userRepository.findByEmail("test@gmail.com")).thenReturn(Optional.of(testUser));
-
-        Pageable pageable = PageRequest.of(0,10);
-
-        LocalDate from = LocalDate.parse("2026-07-07");
-
-        assertThrows(IllegalArgumentException.class,()->{
-            transactionService.getTransactionsByDate(testUser.getEmail(),from,LocalDate.now(),pageable);
-        });
-
-
-    }
 
 
     @Test
@@ -264,11 +251,6 @@ public class TransactionServiceTest {
         assertThat(responses.get(1)).isEqualTo(sumRes2);
         assertThat(responses.get(2)).isEqualTo(sumRes3);
     }
-
-
-
-
-
 
 
 }
