@@ -1,28 +1,39 @@
-# Finance Tracker API (AWS Deployed)
+# Finance Tracker API (Deployed)
 [![codecov](https://codecov.io/gh/NatePombi/finance-tracker-api-aws/graph/badge.svg?token=WSUBYBXDIB)](https://codecov.io/gh/NatePombi/finance-tracker-api-aws)
 ![Java](https://img.shields.io/badge/Java-17-blue)
 ![Build](https://github.com/NatePombi/finance-tracker-api/actions/workflows/test.yml/badge.svg)
-![Spring Boot](https://img.shields.io/badge/SpringBoot-3.5.6-green)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-3.5.10-green)
 ![Last Commit](https://img.shields.io/github/last-commit/NatePombi/finance-tracker-api-aws)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?logo=render&logoColor=white)](https://finance-tracker-api-aws.onrender.com/swagger-ui/index.html)
 
 
-A production-ready RESTful API for managing personal finances, including accounts, transactions, and authentication. The system is built with Spring Boot and deployed on AWS, following a layered architecture (Controller → Service → Repository) to ensure maintainability, scalability, and separation of concerns.
+A production ready RESTful API for managing personal finances, including accounts, transactions, and authentication. The system is built with Spring Boot and deployed on Render, following a layered architecture (Controller → Service → Repository) to ensure maintainability, scalability, and separation of concerns.
 
-It models real-world financial operations with a strong focus on data integrity, security (JWT authentication), and database consistency (PostgreSQL + Flyway migrations).
+It models real world financial operations with a strong focus on data integrity, security (JWT authentication), and database consistency (PostgreSQL + Flyway migrations).
 
-In addition to core financial features, the system integrates AI-powered financial analysis via external APIs, enabling users to receive insights into their spending behavior, detect unusual spending patterns, and get data-driven saving recommendations based on actual transaction history.
+In addition to core financial features, the system integrates AI-powered financial analysis via external APIs, enabling users to receive insights into their spending behavior, detect unusual spending patterns, and get data driven saving recommendations based on actual transaction history.
 
 ---
 
 
 ## Cloud Architecture
 
-Client -> AWS EC2 -> AWS RDS (PostgreSQL Database)
+Client → Render → PostgreSQL
 
 
-- Application hosted on AWS EC2
-- Database managed via AWS RDS
+- Application hosted on Render
+- PostgreSQL database hosted on Render
 - Secure configuration using environment variables
+
+---
+
+## Live Demo
+
+- Swagger UI:
+  - https://finance-tracker-api-aws.onrender.com/swagger-ui/index.html
+
+The API is publicly deployed and can be tested through the interactive Swagger documentation.
+
 
 ---
 
@@ -79,9 +90,8 @@ Transactions belong to Accounts, and Accounts belong to Users ensuring strong ow
 * ![Docker](https://img.shields.io/badge/Docker-Containerization-2496ED?logo=docker&logoColor=white)
 * ![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Orchestration-2496ED?logo=docker&logoColor=white)
 * ![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?logo=swagger&logoColor=black)
-* ![AWS EC2](https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws)
-* ![AWS RDS](https://img.shields.io/badge/AWS-RDS-527FFF?style=for-the-badge&logo=amazonrds)
 * ![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-blue?logo=google&logoColor=white)
+* [![Deployed on Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render&logoColor=white)](https://render.com/)
 
 ---
 
@@ -197,53 +207,35 @@ Pipeline does:
 * Builds JAR
 * Builds Docker
 * Pushes image to Docker Hub
-* Deploys to AWS EC2 via SSH
+
 ---
 
 ## Deployment (AWS EC2)
-1. Connect to EC2
-  ```bash
-    ssh ubuntu@your-ec2-ip
-  ```
-2. Install dependencies
-  ```bash
-    sudo apt update
-    sudo apt install docker.io docker-compose -y
-    sudo systemctl enable docker
-  ```
-3. Clone project OR create deployment folder
-```bash
-  git clone git@github.com:NatePombi/Finance-Tracker-API.git
-  cd Finance-Tracker-API
-```
-4. Create .env file on EC2
-```bash
-  nano .env
-```
-Add:
-```bash
-  DB_URL=jdbc:postgresql://db:5432/financetracker
-  DB_USERNAME=postgres
-  DB_PASSWORD=yourpassword
-  API_KEY=your_sendgrid_api_key
-```
+The application is deployed using Docker on Render.
 
-5. Run Application
-```bash
-  docker compose up -d
-```
+Deployment Architecture
+GitHub
 
-P.S: edit this for your own Public IPs
-swagger UI: http://13.53.122.191:8080/swagger-ui/index.html
+↓
 
-6. Update deployment (After new push)
-```bash
-  docker compose pull
-  docker compose down
-  docker compose up -d
-```
-Or if using CI/CD:
-* GitHub Actions will automatically redeploy via SSH
+Render
+
+↓
+
+Docker
+
+↓
+
+Spring Boot API
+
+↓
+
+PostgreSQL
+
+Render handles the application hosting while PostgreSQL provides the persistent database.
+
+Environment variables are used to keep credentials and sensitive configuration outside of the source code.
+
 ---
 
 ## Environment Variables
@@ -279,7 +271,7 @@ GET /api/v1/accounts/{id}
 
 ---
 
-## API Preview (Live AWS)
+## API Preview (Live)
 
 ![Swagger UI](/.docs/swagger1.png)
 ![Swagger UI](/.docs/swagger2.png)
